@@ -19,6 +19,7 @@ class BuffetWithOwner(BaseModel):
     id: int
     name: str
     price: int
+    owner_id: int
     owner: "UserWithOutDetails"
     model_config = {
         "from_attributes": True
@@ -26,4 +27,5 @@ class BuffetWithOwner(BaseModel):
 
 
 from app.schemas.user import UserWithOutDetails
+
 UserWithOutDetails.model_rebuild()

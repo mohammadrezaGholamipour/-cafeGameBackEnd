@@ -1,7 +1,10 @@
+from typing import Annotated
+
 from app.core.security import hash_password, verify_password, create_access_token
-from app.schemas.auth import LoginRequest, TokenResponse
+from fastapi.security import OAuth2PasswordRequestForm
 from fastapi import APIRouter, Depends, HTTPException
 from app.schemas.user import UserCreate, UserOut
+from app.schemas.auth import TokenResponse
 from sqlalchemy.orm import Session
 from app.db.session import get_db
 from app.models.user import User
@@ -60,10 +63,13 @@ def register(user: UserCreate, db: Session = Depends(get_db)):
 
 # ===================== LOGIN =====================
 @router.post("/login", response_model=TokenResponse)
-def login(data: LoginRequest, db: Session = Depends(get_db)):
+def login(
+        form_data: Annotated[OAuth2PasswordRequestForm, Depends()],
+        db: Session = Depends(get_db)
+):
     user = (
         db.query(User)
-        .filter(User.email == data.email)
+        .filter(User.email == form_data.username)
         .first()
     )
 
@@ -76,7 +82,7 @@ def login(data: LoginRequest, db: Session = Depends(get_db)):
             }
         )
 
-    if not verify_password(data.password, user.password):
+    if not verify_password(form_data.password, user.password):
         raise HTTPException(
             status_code=400,
             detail={

@@ -28,6 +28,6 @@ def create_buffet(
 
 
 @router.get("/list", response_model=List[BuffetWithOwner])
-def list_buffets(db: Session = Depends(get_db)):
+def list_buffets(current_user: User = Depends(get_current_user), db: Session = Depends(get_db)):
     buffets = db.query(Buffet).all()
     return buffets

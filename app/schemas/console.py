@@ -1,10 +1,6 @@
 from pydantic import BaseModel
 
 
-class ConsoleCreate(BaseModel):
-    name: str
-
-
 class ConsoleWithOutUser(BaseModel):
     id: int
     name: str
@@ -16,6 +12,7 @@ class ConsoleWithOutUser(BaseModel):
 class ConsoleWithUser(BaseModel):
     id: int
     name: str
+    owner_id: int
     owner:"UserWithOutDetails"
     model_config = {
         "from_attributes": True
