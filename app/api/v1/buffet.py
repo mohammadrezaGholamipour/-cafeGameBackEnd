@@ -1,6 +1,6 @@
 from app.schemas.buffet import BuffetCreate, BuffetWithOutOwner, BuffetWithOwner
 from app.core.security import get_current_user
-from fastapi import APIRouter, Depends
+from fastapi import APIRouter, Depends, HTTPException
 from app.models.buffet import Buffet
 from sqlalchemy.orm import Session
 from typing import List, Annotated
@@ -16,6 +16,20 @@ def create_buffet(
         buffet: BuffetCreate,
         db: Session = Depends(get_db),
 ):
+    exists = db.query(Buffet.id).filter(
+        Buffet.owner_id == current_user.id,
+        Buffet.name == buffet.name
+    ).first()
+
+    if exists:
+        raise HTTPException(
+            status_code=409,
+            detail={
+                "field": "name",
+                "message": "برای شما محصولی با این نام قبلاً ثبت شده"
+            }
+
+        )
     new_buffet = Buffet(
         name=buffet.name,
         price=buffet.price,
