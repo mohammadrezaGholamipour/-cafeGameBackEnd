@@ -12,6 +12,8 @@ class User(Base):
     mobile = Column(String, nullable=False)
     consoles = relationship("Console", back_populates="owner")
     buffet = relationship("Buffet", back_populates="owner")
+    unitPrice = relationship("UnitPrice", back_populates="owner")
 
+from app.models.unitPrice import UnitPrice
 from app.models.console import Console
 from app.models.buffet import Buffet
