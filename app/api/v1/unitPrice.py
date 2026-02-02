@@ -1,4 +1,4 @@
-from app.schemas.unitPrice import UnitPriceWithOutOwner, UnitPriceCreate, UnitPriceWithOwner
+from app.schemas.unitPrice import UnitPriceCreate, UnitPriceWithOwner
 from fastapi import APIRouter, Depends, HTTPException
 from app.core.security import get_current_user
 from app.models.unitPrice import UnitPrice
