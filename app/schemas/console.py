@@ -1,7 +1,7 @@
 from pydantic import BaseModel
 
 
-class ConsoleWithOutUser(BaseModel):
+class ConsoleWithOutOwner(BaseModel):
     id: int
     name: str
     model_config = {
@@ -9,7 +9,7 @@ class ConsoleWithOutUser(BaseModel):
     }
 
 
-class ConsoleWithUser(BaseModel):
+class ConsoleWithOwner(BaseModel):
     id: int
     name: str
     owner_id: int

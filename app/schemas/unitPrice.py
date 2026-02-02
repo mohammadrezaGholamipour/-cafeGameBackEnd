@@ -5,7 +5,7 @@ class UnitPriceCreate(BaseModel):
     price: int
 
 
-class UnitPriceWithOutUser(BaseModel):
+class UnitPriceWithOutOwner(BaseModel):
     id: int
     price: int
     model_config = {
@@ -13,7 +13,7 @@ class UnitPriceWithOutUser(BaseModel):
     }
 
 
-class UnitPriceWithUser(BaseModel):
+class UnitPriceWithOwner(BaseModel):
     id: int
     price: int
     owner_id: int

@@ -61,8 +61,8 @@ class UserOut(BaseModel):
     userName: str
     email: str
     mobile: str
-    unitPrice: list["UnitPriceWithOutUser"]
-    consoles: list["ConsoleWithOutUser"]
+    unitPrice: list["UnitPriceWithOutOwner"]
+    consoles: list["ConsoleWithOutOwner"]
     buffet: list["BuffetWithOutOwner"]
     model_config = {
         "from_attributes": True
@@ -79,10 +79,10 @@ class UserWithOutDetails(BaseModel):
     }
 
 
-from app.schemas.unitPrice import UnitPriceWithOutUser
-from app.schemas.console import ConsoleWithOutUser
+from app.schemas.unitPrice import UnitPriceWithOutOwner
+from app.schemas.console import ConsoleWithOutOwner
 from app.schemas.buffet import BuffetWithOutOwner
 
-UnitPriceWithOutUser.model_rebuild()
-ConsoleWithOutUser.model_rebuild()
+UnitPriceWithOutOwner.model_rebuild()
+ConsoleWithOutOwner.model_rebuild()
 BuffetWithOutOwner.model_rebuild()

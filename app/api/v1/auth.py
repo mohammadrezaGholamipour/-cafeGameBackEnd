@@ -1,16 +1,20 @@
-from typing import Annotated
 
 from app.core.security import hash_password, verify_password, create_access_token
 from fastapi.security import OAuth2PasswordRequestForm
 from fastapi import APIRouter, Depends, HTTPException
 from app.schemas.user import UserCreate, UserOut
-from app.schemas.auth import TokenResponse
 from sqlalchemy.orm import Session
 from app.db.session import get_db
 from app.models.user import User
+from pydantic import BaseModel
+from typing import Annotated
 
 router = APIRouter(prefix="/api/v1/auth", tags=["Auth"])
 
+
+class TokenResponse(BaseModel):
+    access_token: str
+    token_type: Annotated[str, "bearer"]
 
 # ===================== REGISTER =====================
 @router.post("/register", response_model=UserOut)
