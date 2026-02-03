@@ -14,7 +14,7 @@ def list_users(db: Session = Depends(get_db)):
     return users
 
 
-@router.delete("/remove/{user_id}", status_code=status.HTTP_204_NO_CONTENT)
+@router.delete("/{user_id}", status_code=status.HTTP_204_NO_CONTENT)
 def remove_user(user_id: int = Path(..., gt=0), db: Session = Depends(get_db)):
     user = db.query(User).filter(User.id == user_id).first()
 
