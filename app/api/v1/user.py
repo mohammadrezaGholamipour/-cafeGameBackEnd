@@ -1,3 +1,5 @@
+from typing import Annotated
+
 from fastapi import APIRouter, Depends, status, HTTPException, Path
 from app.core.security import get_current_user
 from app.schemas.user import UserOut
@@ -15,7 +17,7 @@ def list_users(db: Session = Depends(get_db)):
 
 
 @router.delete("/{user_id}", status_code=status.HTTP_204_NO_CONTENT)
-def remove_user(user_id: int = Path(..., gt=0), db: Session = Depends(get_db)):
+def remove_user(user_id: Annotated[int, Path(..., gt=0)], db: Session = Depends(get_db)):
     user = db.query(User).filter(User.id == user_id).first()
 
     if not user:
