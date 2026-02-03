@@ -1,5 +1,5 @@
 from app.schemas.buffet import BuffetCreate, BuffetWithOutOwner, BuffetWithOwner
-from fastapi import APIRouter, Depends, HTTPException
+from fastapi import APIRouter, Depends, HTTPException, status
 from app.core.security import get_current_user
 from app.models.buffet import Buffet
 from sqlalchemy.orm import Session
@@ -10,7 +10,7 @@ from app.models.user import User
 router = APIRouter(prefix="/api/v1/buffet", tags=["Buffet"], dependencies=[Depends(get_current_user)])
 
 
-@router.post("/create", response_model=BuffetWithOutOwner, status_code=201)
+@router.post("/create", response_model=BuffetWithOutOwner, status_code=status.HTTP_201_CREATED)
 def create_buffet(
         current_user: Annotated[User, Depends(get_current_user)],
         buffet: BuffetCreate,
@@ -23,7 +23,7 @@ def create_buffet(
 
     if exists:
         raise HTTPException(
-            status_code=409,
+            status_code=status.HTTP_409_CONFLICT,
             detail={
                 "field": "name",
                 "message": "برای شما محصولی با این نام قبلاً ثبت شده"

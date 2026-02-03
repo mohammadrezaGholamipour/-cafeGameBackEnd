@@ -1,5 +1,5 @@
 from app.schemas.unitPrice import UnitPriceCreate, UnitPriceWithOwner
-from fastapi import APIRouter, Depends, HTTPException
+from fastapi import APIRouter, Depends, HTTPException, status
 from app.core.security import get_current_user
 from app.models.unitPrice import UnitPrice
 from sqlalchemy.orm import Session
@@ -10,7 +10,7 @@ from app.models.user import User
 router = APIRouter(prefix="/api/v1/unitPrice", tags=["UnitPrice"], dependencies=[Depends(get_current_user)])
 
 
-@router.post("/create", response_model=UnitPriceWithOwner, status_code=201)
+@router.post("/create", response_model=UnitPriceWithOwner, status_code=status.HTTP_201_CREATED)
 def create_buffet(
         current_user: Annotated[User, Depends(get_current_user)],
         unit_price: UnitPriceCreate,
@@ -23,7 +23,7 @@ def create_buffet(
 
     if exists:
         raise HTTPException(
-            status_code=409,
+            status_code=status.HTTP_409_CONFLICT,
             detail={
                 "field": "price",
                 "message": "قبلا قیمت واحد با این مقدار ایجاد شده است"

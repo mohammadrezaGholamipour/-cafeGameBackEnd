@@ -1,6 +1,6 @@
 from app.schemas.console import ConsoleWithOwner
 from app.core.security import get_current_user
-from fastapi import APIRouter, Depends
+from fastapi import APIRouter, Depends,status
 from app.models.console import Console
 from sqlalchemy.orm import Session
 from app.db.session import get_db
@@ -13,7 +13,7 @@ router = APIRouter(prefix="/api/v1/console", tags=["Console"], dependencies=[Dep
 @router.post(
     "/create",
     response_model=ConsoleWithOwner,
-    status_code=201
+    status_code=status.HTTP_201_CREATED,
 )
 def create_console(
         current_user: Annotated[User, Depends(get_current_user)],

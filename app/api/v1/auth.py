@@ -1,7 +1,6 @@
-
 from app.core.security import hash_password, verify_password, create_access_token
+from fastapi import APIRouter, Depends, HTTPException,status
 from fastapi.security import OAuth2PasswordRequestForm
-from fastapi import APIRouter, Depends, HTTPException
 from app.schemas.user import UserCreate, UserOut
 from sqlalchemy.orm import Session
 from app.db.session import get_db
@@ -16,6 +15,7 @@ class TokenResponse(BaseModel):
     access_token: str
     token_type: Annotated[str, "bearer"]
 
+
 # ===================== REGISTER =====================
 @router.post("/register", response_model=UserOut)
 def register(user: UserCreate, db: Session = Depends(get_db)):
@@ -28,7 +28,7 @@ def register(user: UserCreate, db: Session = Depends(get_db)):
         )
         if existing_email:
             raise HTTPException(
-                status_code=400,
+                status_code=status.HTTP_409_CONFLICT,
                 detail={
                     "field": "email",
                     "message": "این ایمیل قبلاً ثبت شده است"
@@ -79,7 +79,7 @@ def login(
 
     if not user:
         raise HTTPException(
-            status_code=400,
+            status_code=status.HTTP_404_NOT_FOUND,
             detail={
                 "field": "email",
                 "message": "کاربری با این ایمیل یافت نشد"
@@ -88,7 +88,7 @@ def login(
 
     if not verify_password(form_data.password, user.password):
         raise HTTPException(
-            status_code=400,
+            status_code=status.HTTP_400_BAD_REQUEST,
             detail={
                 "field": "password",
                 "message": "رمز عبور نادرست است"

@@ -17,17 +17,21 @@ error_messages = {
     "type_error": "نوع داده واردشده صحیح نیست",
     "json_invalid": "فرمت بدنه درخواست نامعتبر است",
 
-    # path overrides
+    # path / number constraints
+    "greater_than": "مقدار واردشده باید بزرگ‌تر باشد",
     "greater_than_equal": "مقدار واردشده کمتر از حد مجاز است",
+    "less_than": "مقدار واردشده بیشتر از حد مجاز است",
     "less_than_equal": "مقدار واردشده بیشتر از حد مجاز است",
+
     "int_parsing": "مقدار باید عدد صحیح باشد",
     "int_type": "مقدار باید عدد صحیح باشد",
     "missing_path": "پارامتر مسیر الزامی است",
 
     # method errors
     "method_not_allowed": "متد درخواستی مجاز نمی‌باشد",
+
     # token
-    "token_invalid": "توکن نامعتبر می‌باشد",
+    "token_invalid": "لطفا ابتدا احراز هویت خود را انجام دهید",
 }
 
 
@@ -95,13 +99,13 @@ async def validation_exception_handler(request: Request, exc: RequestValidationE
 
 
 async def http_exception_handler(request: Request, exc: StarletteHTTPException):
-    print('HTTP exception handler')
+    print("HTTP exception handler")
 
     # ------------------ JSON خراب ------------------
     if exc.status_code == 400:
         if isinstance(exc.detail, str) and (
-            "parsing the body" in exc.detail.lower()
-            or "invalid json" in exc.detail.lower()
+                "parsing the body" in exc.detail.lower()
+                or "invalid json" in exc.detail.lower()
         ):
             return JSONResponse(
                 status_code=400,
@@ -123,19 +127,27 @@ async def http_exception_handler(request: Request, exc: StarletteHTTPException):
             }
         )
 
-    # ------------------ NOT FOUND ------------------
+    # ------------------ NOT FOUND (Dynamic) ------------------
     if exc.status_code == 404:
-        return JSONResponse(
-            status_code=404,
-            content={
-                "errors": [
-                    {
-                        "field": "route",
-                        "message": "آدرس وارد شده موجود نمیباشد"
-                    }
-                ]
-            }
-        )
+
+        if exc.detail == "Not Found":
+            return JSONResponse(
+                status_code=404,
+                content={
+                    "errors": [
+                        {
+                            "field": "route",
+                            "message": "آدرس وارد شده موجود نمی‌باشد"
+                        }
+                    ]
+                }
+            )
+
+        if isinstance(exc.detail, dict):
+            return JSONResponse(
+                status_code=404,
+                content={"errors": [exc.detail]}
+            )
 
     # ------------------ METHOD NOT ALLOWED ------------------
     if exc.status_code == 405:
@@ -152,10 +164,10 @@ async def http_exception_handler(request: Request, exc: StarletteHTTPException):
     if isinstance(exc.detail, dict):
         errors = [exc.detail]
     else:
-        errors = [{"field": "general", "message": str(exc.detail)}]
+        errors = [{"field": "نامشخص", "message": "خطای غیرمنتظره‌ای رخ داده است"},
+                  {"field": "general", "message": str(exc.detail)}]
 
     return JSONResponse(
         status_code=exc.status_code,
         content={"errors": errors}
     )
-
