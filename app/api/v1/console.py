@@ -36,6 +36,6 @@ def create_console(
 
 
 @router.get("/list", response_model=list[ConsoleWithOwner])
-def get_all_consoles(db: Session = Depends(get_db)):
+def list_consoles(db: Session = Depends(get_db)):
     consoles = db.query(Console).all()
     return consoles

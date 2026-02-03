@@ -9,7 +9,7 @@ router = APIRouter(prefix="/api/v1/user", tags=["User"], dependencies=[Depends(g
 
 
 @router.get("/list", response_model=list[UserOut])
-def get_users(db: Session = Depends(get_db)):
+def list_users(db: Session = Depends(get_db)):
     users = db.query(User).all()
     return users
 

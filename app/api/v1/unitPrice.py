@@ -11,7 +11,7 @@ router = APIRouter(prefix="/api/v1/unitPrice", tags=["UnitPrice"], dependencies=
 
 
 @router.post("/create", response_model=UnitPriceWithOwner, status_code=status.HTTP_201_CREATED)
-def create_buffet(
+def create_unit_price(
         current_user: Annotated[User, Depends(get_current_user)],
         unit_price: UnitPriceCreate,
         db: Session = Depends(get_db),
@@ -41,6 +41,6 @@ def create_buffet(
 
 
 @router.get("/list", response_model=List[UnitPriceWithOwner])
-def list_buffets(db: Session = Depends(get_db)):
+def list_unit_price(db: Session = Depends(get_db)):
     unit_prices = db.query(UnitPrice).all()
     return unit_prices
