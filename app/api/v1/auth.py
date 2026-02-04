@@ -1,5 +1,5 @@
 from app.core.security import hash_password, verify_password, create_access_token
-from fastapi import APIRouter, Depends, HTTPException,status
+from fastapi import APIRouter, Depends, HTTPException, status
 from fastapi.security import OAuth2PasswordRequestForm
 from app.schemas.user import UserCreate, UserOut
 from sqlalchemy.orm import Session
@@ -35,7 +35,6 @@ def register(user: UserCreate, db: Session = Depends(get_db)):
                 }
             )
 
-    # بررسی موبایل
     if user.mobile:
         existing_mobile = (
             db.query(User)
@@ -44,7 +43,7 @@ def register(user: UserCreate, db: Session = Depends(get_db)):
         )
         if existing_mobile:
             raise HTTPException(
-                status_code=400,
+                status_code=status.HTTP_409_CONFLICT,
                 detail={
                     "field": "mobile",
                     "message": "این شماره موبایل قبلاً ثبت شده است"
@@ -79,20 +78,14 @@ def login(
 
     if not user:
         raise HTTPException(
-            status_code=status.HTTP_404_NOT_FOUND,
-            detail={
-                "field": "email",
-                "message": "کاربری با این ایمیل یافت نشد"
-            }
+            status_code=status.HTTP_401_UNAUTHORIZED,
+            detail={"message": "ایمیل یا رمز عبور اشتباه است"}
         )
-
+    # خواستم شرط ها جدا باشه اما پیام ها یکیه که هکر اطلاعات بدست نیاره
     if not verify_password(form_data.password, user.password):
         raise HTTPException(
-            status_code=status.HTTP_400_BAD_REQUEST,
-            detail={
-                "field": "password",
-                "message": "رمز عبور نادرست است"
-            }
+            status_code=status.HTTP_401_UNAUTHORIZED,
+            detail={"message": "ایمیل یا رمز عبور اشتباه است"}
         )
 
     access_token = create_access_token(

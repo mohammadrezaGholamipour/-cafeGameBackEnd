@@ -25,10 +25,7 @@ def update_user(
     if not user:
         raise HTTPException(
             status_code=status.HTTP_404_NOT_FOUND,
-            detail={
-                "field": "user",
-                "message": "کاربر مورد نظر یافت نشد"
-            }
+            detail={"message": "کاربر مورد نظر پیدا نشد"}
         )
 
     data = payload.model_dump(exclude_unset=True)
@@ -46,10 +43,7 @@ def remove_user(user_id: Annotated[int, Path(..., gt=0)], db: Session = Depends(
     if not user:
         raise HTTPException(
             status_code=status.HTTP_404_NOT_FOUND,
-            detail={
-                "field": "user",
-                "message": "کاربری با این آیدی وجود ندارد"
-            }
+            detail={"message": "کاربر مورد نظر پیدا نشد"}
         )
 
     db.delete(user)

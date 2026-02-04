@@ -26,29 +26,19 @@ def get_current_user(token: str = Depends(oauth2_scheme), db: Session = Depends(
         if not user_id:
             raise HTTPException(
                 status_code=status.HTTP_404_NOT_FOUND,
-                detail={
-                    "field": "user",
-                    "message": "کاربر مورد نظر پیدا نشد"
-                }
+                detail={"message": "کاربر مورد نظر پیدا نشد"}
             )
     except JWTError:
         raise HTTPException(
             status_code=status.HTTP_401_UNAUTHORIZED,
-            detail={
-                "field": "token",
-                "message": "لطفا ابتدا احراز هویت خود را انجام دهید"
-            }
+            detail={"message": "لطفا ابتدا احراز هویت خود را انجام دهید"}
         )
 
-    # اینجا شیء واقعی User رو از دیتابیس می‌گیری
     user = db.query(User).filter(User.id == int(user_id)).first()
     if not user:
         raise HTTPException(
             status_code=status.HTTP_404_NOT_FOUND,
-            detail={
-                "field": "user",
-                "message": "کاربر مورد نظر پیدا نشد"
-            }
+            detail={"message": "کاربر مورد نظر پیدا نشد"}
         )
     return user
 

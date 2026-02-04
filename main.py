@@ -17,6 +17,38 @@ app = FastAPI(title="CafeGame", description="API for managing CafeGame", version
             }
         }
     },
+    409: {
+        "description": "The resource already exists or violates a unique constraint",
+        "content": {
+            "application/json": {
+                "example": {
+                    "error": [
+                        {"field": "نام فیلد", "message": "متن خطا"}
+                    ]
+                }
+            }
+        }
+    },
+    401: {
+        "description": "The request requires authentication or the provided credentials are invalid",
+        "content": {
+            "application/json": {
+                "example": {
+                    "error": {"message": "متن خطا"}
+                }
+            }
+        }
+    },
+    404: {
+        "description": "The requested resource was not found on the server",
+        "content": {
+            "application/json": {
+                "example": {
+                    "error": {"message": "متن خطا"}
+                }
+            }
+        }
+    }
 })
 
 app.include_router(auth.router)

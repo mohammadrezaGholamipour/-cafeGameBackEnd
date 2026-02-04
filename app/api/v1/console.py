@@ -55,7 +55,7 @@ def delete_console(
         raise HTTPException(
             status_code=status.HTTP_404_NOT_FOUND,
             detail={
-                "field": "console_id",
+                "field": "console",
                 "message": "دستگاهی با این آیدی وجود ندارد"
             }
         )
@@ -64,7 +64,7 @@ def delete_console(
         raise HTTPException(
             status_code=status.HTTP_403_FORBIDDEN,
             detail={
-                "field": "user_id",
+                "field": "user",
                 "message": "این دستگاه مطعلق به شما نیست و اجازه حذف آن را ندارید"
             }
         )

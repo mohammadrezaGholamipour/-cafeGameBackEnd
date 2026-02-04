@@ -116,15 +116,20 @@ async def http_exception_handler(request: Request, exc: StarletteHTTPException):
                 }
             )
 
-    # ------------------ UNAUTHORIZED (Token) ------------------
+    # ------------------ UNAUTHORIZED ------------------
     if exc.status_code == 401:
+        detail = getattr(exc, "detail", "")
+
+        detail_str = str(detail).lower()
+
+        if "token" in detail_str or "authorization" in detail_str:
+            return JSONResponse(
+                status_code=401,
+                content={"error": {"message": error_messages["token_invalid"]}})
+
         return JSONResponse(
             status_code=401,
-            content={
-                "errors": [
-                    {"field": "token", "message": error_messages["token_invalid"]}
-                ]
-            }
+            content={"error": detail}
         )
 
     # ------------------ NOT FOUND (Dynamic) ------------------
@@ -133,20 +138,13 @@ async def http_exception_handler(request: Request, exc: StarletteHTTPException):
         if exc.detail == "Not Found":
             return JSONResponse(
                 status_code=404,
-                content={
-                    "errors": [
-                        {
-                            "field": "route",
-                            "message": "آدرس وارد شده معتبر نمی‌باشد"
-                        }
-                    ]
-                }
+                content={"error": {"message": "آدرس وارد شده معتبر نمی‌باشد"}}
             )
 
         if isinstance(exc.detail, dict):
             return JSONResponse(
                 status_code=404,
-                content={"errors": [exc.detail]}
+                content={"error": exc.detail}
             )
 
     # ------------------ METHOD NOT ALLOWED ------------------
@@ -162,12 +160,12 @@ async def http_exception_handler(request: Request, exc: StarletteHTTPException):
 
     # ------------------ سایر HTTPException ها ------------------
     if isinstance(exc.detail, dict):
-        errors = [exc.detail]
+        error = [exc.detail]
     else:
-        errors = [{"field": "نامشخص", "message": "خطای غیرمنتظره‌ای رخ داده است"},
-                  {"field": "general", "message": str(exc.detail)}]
+        error = [{"field": "نامشخص", "message": "خطای غیرمنتظره‌ای رخ داده است"},
+                 {"field": "general", "message": str(exc.detail)}]
 
     return JSONResponse(
         status_code=exc.status_code,
-        content={"errors": errors}
+        content={"errors": error}
     )
