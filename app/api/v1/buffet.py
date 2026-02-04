@@ -24,11 +24,7 @@ def create_buffet(
     if exists:
         raise HTTPException(
             status_code=status.HTTP_409_CONFLICT,
-            detail={
-                "field": "name",
-                "message": "برای شما محصولی با این نام قبلاً ثبت شده"
-            }
-
+            detail={"message": "برای شما محصولی با این نام قبلاً ثبت شده"}
         )
     new_buffet = Buffet(
         name=buffet.name,
