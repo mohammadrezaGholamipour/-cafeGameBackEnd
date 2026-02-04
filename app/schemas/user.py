@@ -55,6 +55,46 @@ class UserCreate(BaseModel):
             raise PydanticCustomError("repeatPassword", "رمز عبور تکرار شده صحیح نمیباشد")
         return v
 
+class UserUpdatePatch(BaseModel):
+    email: str | None = None
+    mobile: str | None = None
+    userName: str | None = None
+
+    @field_validator("email")
+    @classmethod
+    def valid_email(cls, v):
+        if v is None:
+            return v
+        pattern = r"^[\w\.-]+@[\w\.-]+\.\w+$"
+        if not re.match(pattern, v):
+            raise PydanticCustomError("email", "ایمیل وارد شده معتبر نمی‌باشد")
+        return v
+
+    @field_validator("userName")
+    @classmethod
+    def username_length(cls, v):
+        if v is None:
+            return v
+        if len(v) < 3:
+            raise PydanticCustomError(
+                "userName",
+                "نام و نام خانوادگی حداقل باید ۳ حرف باشد"
+            )
+        return v
+
+    @field_validator("mobile")
+    @classmethod
+    def valid_mobile(cls, v):
+        if v is None:
+            return v
+        pattern = r"^09\d{9}$"
+        if not re.match(pattern, v):
+            raise PydanticCustomError(
+                "mobile",
+                "شماره موبایل وارد شده معتبر نمیباشد"
+            )
+        return v
+
 
 class UserOut(BaseModel):
     id: int

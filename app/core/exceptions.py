@@ -137,7 +137,7 @@ async def http_exception_handler(request: Request, exc: StarletteHTTPException):
                     "errors": [
                         {
                             "field": "route",
-                            "message": "آدرس وارد شده موجود نمی‌باشد"
+                            "message": "آدرس وارد شده معتبر نمی‌باشد"
                         }
                     ]
                 }
