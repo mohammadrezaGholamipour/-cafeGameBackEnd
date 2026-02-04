@@ -48,6 +48,16 @@ app = FastAPI(title="CafeGame", description="API for managing CafeGame", version
                 }
             }
         }
+    },
+    403: {
+        "description": "The client does not have permission to access this resource",
+        "content": {
+            "application/json": {
+                "example": {
+                    "error": {"message": "متن خطا"}
+                }
+            }
+        }
     }
 })
 

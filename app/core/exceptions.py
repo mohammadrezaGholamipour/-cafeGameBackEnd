@@ -160,12 +160,12 @@ async def http_exception_handler(request: Request, exc: StarletteHTTPException):
 
     # ------------------ سایر HTTPException ها ------------------
     if isinstance(exc.detail, dict):
-        error = [exc.detail]
+        error = exc.detail
     else:
         error = [{"field": "نامشخص", "message": "خطای غیرمنتظره‌ای رخ داده است"},
                  {"field": "general", "message": str(exc.detail)}]
 
     return JSONResponse(
         status_code=exc.status_code,
-        content={"errors": error}
+        content={"error": error}
     )

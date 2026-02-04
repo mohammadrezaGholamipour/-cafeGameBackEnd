@@ -19,8 +19,14 @@ def create_console(
         current_user: Annotated[User, Depends(get_current_user)],
         db: Session = Depends(get_db),
 ):
-    last_console = db.query(Console).order_by(Console.id.desc()).first()
-    next_number = 1 if not last_console else last_console.id + 1
+    last_console = (
+        db.query(Console)
+        .filter(Console.owner_id == current_user.id)
+        .order_by(Console.id.desc())
+        .first()
+    )
+
+    next_number = 1 if not last_console else int(last_console.name) + 1
 
     new_console = Console(
         name=str(next_number),
@@ -32,6 +38,7 @@ def create_console(
     db.refresh(new_console)
 
     return new_console
+
 
 
 @router.get("/list", response_model=list[ConsoleWithOwner])
@@ -54,19 +61,13 @@ def delete_console(
     if not console:
         raise HTTPException(
             status_code=status.HTTP_404_NOT_FOUND,
-            detail={
-                "field": "console",
-                "message": "دستگاهی با این آیدی وجود ندارد"
-            }
+            detail={"message": "دستگاه مورد نظر وجود ندارد"}
         )
 
     if console.owner_id != current_user.id:
         raise HTTPException(
             status_code=status.HTTP_403_FORBIDDEN,
-            detail={
-                "field": "user",
-                "message": "این دستگاه مطعلق به شما نیست و اجازه حذف آن را ندارید"
-            }
+            detail={"message": "این دستگاه مطعلق به شما نیست و اجازه حذف آن را ندارید"}
         )
 
     db.delete(console)
