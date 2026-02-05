@@ -7,7 +7,7 @@ from fastapi import Request
 # ---------------- ERROR ---------------- #
 error_messages = {
     # body/query errors
-    "string_too_short": "طول مقدار واردشده صحیح نمی‌باشد",
+    "string_too_short": "طول مقدار وارد شده کمتر از حد مجاز است",
     "string_type": "مقدار باید از نوع متن باشد",
     "missing": "این فیلد الزامی است",
     "enum": "مقدار واردشده معتبر نیست",
