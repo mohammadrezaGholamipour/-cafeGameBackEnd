@@ -55,7 +55,7 @@ class UserCreate(BaseModel):
             raise PydanticCustomError("repeatPassword", "رمز عبور تکرار شده صحیح نمیباشد")
         return v
 
-class UserUpdatePatch(BaseModel):
+class UserUpdate(BaseModel):
     email: str | None = None
     mobile: str | None = None
     userName: str | None = None

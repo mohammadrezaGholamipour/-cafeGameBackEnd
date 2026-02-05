@@ -1,6 +1,6 @@
 from fastapi import APIRouter, Depends, status, HTTPException, Path
 from app.core.security import get_current_user
-from app.schemas.user import UserOut, UserUpdatePatch
+from app.schemas.user import UserOut, UserUpdate
 from sqlalchemy.orm import Session
 from app.db.session import get_db
 from app.models.user import User
@@ -17,7 +17,7 @@ def list_users(db: Session = Depends(get_db)):
 
 @router.patch("/update", response_model=UserOut)
 def update_user(
-    payload: UserUpdatePatch,
+    payload: UserUpdate,
     db: Session = Depends(get_db),
     current_user: User = Depends(get_current_user)
 ):
