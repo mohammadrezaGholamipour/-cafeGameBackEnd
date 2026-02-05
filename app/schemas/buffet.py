@@ -1,9 +1,14 @@
-from pydantic import BaseModel
+from pydantic import BaseModel, Field
 
 
 class BuffetCreate(BaseModel):
-    name: str
-    price: int
+    name: str = Field(..., min_length=1)
+    price: int = Field(..., gt=0)
+
+
+class BuffetUpdate(BaseModel):
+    name: str | None = Field(None, min_length=1)
+    price: int | None = Field(None, gt=0)
 
 
 class BuffetWithOutOwner(BaseModel):

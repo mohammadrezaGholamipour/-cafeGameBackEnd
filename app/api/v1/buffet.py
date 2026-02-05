@@ -1,5 +1,5 @@
-from app.schemas.buffet import BuffetCreate, BuffetWithOutOwner, BuffetWithOwner
-from fastapi import APIRouter, Depends, HTTPException, status
+from app.schemas.buffet import BuffetCreate, BuffetWithOutOwner, BuffetWithOwner, BuffetUpdate
+from fastapi import APIRouter, Depends, HTTPException, status, Path
 from app.core.security import get_current_user
 from app.models.buffet import Buffet
 from sqlalchemy.orm import Session
@@ -35,6 +35,35 @@ def create_buffet(
     db.commit()
     db.refresh(new_buffet)
     return new_buffet
+
+
+@router.patch("/update/{buffet_id}", response_model=BuffetWithOutOwner)
+def update_buffet(
+        current_user: Annotated[User, Depends(get_current_user)],
+        buffet_id: int = Path(..., gt=0),
+        payload: BuffetUpdate = Depends(),
+        db: Session = Depends(get_db),
+):
+    buffet = db.query(Buffet).filter(Buffet.id == buffet_id).first()
+
+    if not buffet:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail={"message": "محصول مورد نظر پیدا نشد"}
+        )
+    if Buffet.owner_id == current_user.id:
+        raise HTTPException(
+            status_code=status.HTTP_403_FORBIDDEN,
+            detail={"message": "این محصول مطعلق به شما نیست و اجازه حذف آن را ندارید"}
+        )
+
+    data = payload.model_dump(exclude_unset=True)
+    for field, value in data.items():
+        setattr(buffet, field, value)
+
+    db.commit()
+    db.refresh(buffet)
+    return buffet
 
 
 @router.get("/list", response_model=List[BuffetWithOwner])
