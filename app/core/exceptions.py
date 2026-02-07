@@ -122,7 +122,7 @@ async def http_exception_handler(request: Request, exc: StarletteHTTPException):
 
         detail_str = str(detail).lower()
 
-        if "token" in detail_str or "authorization" in detail_str:
+        if "token" in detail_str or "authenticated" in detail_str:
             return JSONResponse(
                 status_code=401,
                 content={"error": {"message": error_messages["token_invalid"]}})
