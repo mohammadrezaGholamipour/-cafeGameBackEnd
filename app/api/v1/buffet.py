@@ -40,8 +40,8 @@ def create_buffet(
 @router.patch("/update/{buffet_id}", response_model=BuffetWithOutOwner)
 def update_buffet(
         current_user: Annotated[User, Depends(get_current_user)],
+        payload: BuffetUpdate,
         buffet_id: int = Path(..., gt=0),
-        payload: BuffetUpdate = Depends(),
         db: Session = Depends(get_db),
 ):
     buffet = db.query(Buffet).filter(Buffet.id == buffet_id).first()
@@ -51,7 +51,7 @@ def update_buffet(
             status_code=status.HTTP_404_NOT_FOUND,
             detail={"message": "محصول مورد نظر پیدا نشد"}
         )
-    if Buffet.owner_id == current_user.id:
+    if buffet.owner_id != current_user.id:
         raise HTTPException(
             status_code=status.HTTP_403_FORBIDDEN,
             detail={"message": "این محصول مطعلق به شما نیست و اجازه حذف آن را ندارید"}
@@ -70,3 +70,29 @@ def update_buffet(
 def list_buffets(db: Session = Depends(get_db)):
     buffets = db.query(Buffet).all()
     return buffets
+
+@router.delete(
+    "/{buffet_id}",
+    status_code=status.HTTP_204_NO_CONTENT
+)
+def delete_buffet(
+        buffet_id: Annotated[int, Path(..., gt=0)],
+        current_user: Annotated[User, Depends(get_current_user)],
+        db: Session = Depends(get_db),
+):
+    buffet = db.query(Buffet).filter(Buffet.id == buffet_id).first()
+
+    if not buffet:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail={"message": "همچین موردی وجود ندارد"}
+        )
+
+    if buffet.owner_id != current_user.id:
+        raise HTTPException(
+            status_code=status.HTTP_403_FORBIDDEN,
+            detail={"message": "این مورد متعلق به شما نیست و امکان حذف آن برای شما وجود ندارد"}
+        )
+
+    db.delete(buffet)
+    db.commit()
