@@ -1,9 +1,11 @@
-from pydantic import BaseModel
+from pydantic import BaseModel, Field
 
 
 class UnitPriceCreate(BaseModel):
-    price: int
+    price: int = Field(..., gt=0)
 
+class UnitPriceUpdate(BaseModel):
+    price: int | None = Field(None, gt=0)
 
 class UnitPriceWithOutOwner(BaseModel):
     id: int
