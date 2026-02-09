@@ -37,7 +37,7 @@ def create_buffet(
     return new_buffet
 
 
-@router.patch("/update/{buffet_id}", response_model=BuffetWithOutOwner)
+@router.patch("/update/{buffet_id}", response_model=BuffetWithOutOwner,status_code=status.HTTP_200_OK)
 def update_buffet(
         current_user: Annotated[User, Depends(get_current_user)],
         payload: BuffetUpdate,
