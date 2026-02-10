@@ -24,7 +24,7 @@ def create_buffet(
     if exists:
         raise HTTPException(
             status_code=status.HTTP_409_CONFLICT,
-            detail={"message": "برای شما محصولی با این نام قبلاً ثبت شده"}
+            detail={"field":"Buffet","message": "برای شما محصولی با این نام قبلاً ثبت شده"}
         )
     new_buffet = Buffet(
         name=buffet.name,
@@ -49,12 +49,12 @@ def update_buffet(
     if not buffet:
         raise HTTPException(
             status_code=status.HTTP_404_NOT_FOUND,
-            detail={"message": "محصول مورد نظر پیدا نشد"}
+            detail={"field":"Buffet","message": "محصول مورد نظر پیدا نشد"}
         )
     if buffet.owner_id != current_user.id:
         raise HTTPException(
             status_code=status.HTTP_403_FORBIDDEN,
-            detail={"message": "این محصول مطعلق به شما نیست و اجازه حذف آن را ندارید"}
+            detail={"field":"Buffet","message": "این محصول مطعلق به شما نیست و اجازه حذف آن را ندارید"}
         )
 
     data = payload.model_dump(exclude_unset=True)
@@ -85,13 +85,13 @@ def delete_buffet(
     if not buffet:
         raise HTTPException(
             status_code=status.HTTP_404_NOT_FOUND,
-            detail={"message": "همچین موردی وجود ندارد"}
+            detail={"field":"Buffet","message": "همچین موردی وجود ندارد"}
         )
 
     if buffet.owner_id != current_user.id:
         raise HTTPException(
             status_code=status.HTTP_403_FORBIDDEN,
-            detail={"message": "این مورد متعلق به شما نیست و امکان حذف آن برای شما وجود ندارد"}
+            detail={"field":"Buffet","message": "این مورد متعلق به شما نیست و امکان حذف آن برای شما وجود ندارد"}
         )
 
     db.delete(buffet)

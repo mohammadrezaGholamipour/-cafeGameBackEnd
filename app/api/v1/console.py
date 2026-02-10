@@ -61,13 +61,13 @@ def delete_console(
     if not console:
         raise HTTPException(
             status_code=status.HTTP_404_NOT_FOUND,
-            detail={"message": "دستگاه مورد نظر وجود ندارد"}
+            detail={"field":"Console","message": "دستگاه مورد نظر وجود ندارد"}
         )
 
     if console.owner_id != current_user.id:
         raise HTTPException(
             status_code=status.HTTP_403_FORBIDDEN,
-            detail={"message": "این دستگاه مطعلق به شما نیست و اجازه حذف آن را ندارید"}
+            detail={"field":"Console","message": "این دستگاه مطعلق به شما نیست و اجازه حذف آن را ندارید"}
         )
 
     db.delete(console)

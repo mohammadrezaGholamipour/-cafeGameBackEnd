@@ -79,13 +79,13 @@ def login(
     if not user:
         raise HTTPException(
             status_code=status.HTTP_401_UNAUTHORIZED,
-            detail={"message": "ایمیل یا رمز عبور اشتباه است"}
+            detail={"field":"email or password","message": "ایمیل یا رمز عبور اشتباه است"}
         )
     # خواستم شرط ها جدا باشه اما پیام ها یکیه که هکر اطلاعات بدست نیاره
     if not verify_password(form_data.password, user.password):
         raise HTTPException(
             status_code=status.HTTP_401_UNAUTHORIZED,
-            detail={"message": "ایمیل یا رمز عبور اشتباه است"}
+            detail={"field":"email or password","message": "ایمیل یا رمز عبور اشتباه است"}
         )
 
     access_token = create_access_token(
