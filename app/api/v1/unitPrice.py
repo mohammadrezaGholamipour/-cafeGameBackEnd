@@ -39,35 +39,6 @@ def create_unit_price(
     db.refresh(new_unit_price)
     return new_unit_price
 
-@router.patch("/update/{unit_price_id}", response_model=UnitPriceWithOwner, status_code=status.HTTP_200_OK)
-def update_unit_price(
-        current_user: Annotated[User, Depends(get_current_user)],
-        payload: UnitPriceUpdate,
-        unit_price_id: int = Path(..., gt=0),
-        db: Session = Depends(get_db),
-):
-    unit_price = db.query(UnitPrice).filter(UnitPrice.id == unit_price_id).first()
-
-    if not unit_price:
-        raise HTTPException(
-            status_code=status.HTTP_404_NOT_FOUND,
-            detail={"message": "قیمت واحد مورد نظر پیدا نشد"}
-        )
-    if unit_price.owner_id != current_user.id:
-        raise HTTPException(
-            status_code=status.HTTP_403_FORBIDDEN,
-            detail={"message": "این قیمت واحد مطعلق به شما نیست و اجازه حذف آن را ندارید"}
-        )
-
-    data = payload.model_dump(exclude_unset=True)
-    for field, value in data.items():
-        setattr(unit_price, field, value)
-
-    db.commit()
-    db.refresh(unit_price)
-    return unit_price
-
-
 @router.get("/list", response_model=List[UnitPriceWithOwner])
 def list_unit_price(db: Session = Depends(get_db)):
     unit_prices = db.query(UnitPrice).all()
