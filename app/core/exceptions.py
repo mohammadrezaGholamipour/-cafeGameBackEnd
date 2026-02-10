@@ -125,11 +125,11 @@ async def http_exception_handler(request: Request, exc: StarletteHTTPException):
         if "token" in detail_str or "authenticated" in detail_str:
             return JSONResponse(
                 status_code=401,
-                content={"error": {"message": error_messages["token_invalid"]}})
+                content={"error": [{"message": error_messages["token_invalid"]}]})
 
         return JSONResponse(
             status_code=401,
-            content={"error": detail}
+            content={"error": [detail]}
         )
 
     # ------------------ NOT FOUND (Dynamic) ------------------
@@ -138,13 +138,13 @@ async def http_exception_handler(request: Request, exc: StarletteHTTPException):
         if exc.detail == "Not Found":
             return JSONResponse(
                 status_code=404,
-                content={"error": {"message": "آدرس وارد شده معتبر نمی‌باشد"}}
+                content={"error": [{"message": "آدرس وارد شده معتبر نمی‌باشد"}]}
             )
 
         if isinstance(exc.detail, dict):
             return JSONResponse(
                 status_code=404,
-                content={"error": exc.detail}
+                content=[{"error": exc.detail}]
             )
 
     # ------------------ METHOD NOT ALLOWED ------------------
