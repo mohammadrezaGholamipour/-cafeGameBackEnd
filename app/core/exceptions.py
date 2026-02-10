@@ -38,7 +38,7 @@ error_messages = {
 # ---------------- Handlers ---------------- #
 async def validation_exception_handler(request: Request, exc: RequestValidationError):
     print('Validation exception handler')
-    errors = []
+    error = []
 
     has_body = (
             request.method in ("POST", "PUT", "PATCH")
@@ -54,28 +54,28 @@ async def validation_exception_handler(request: Request, exc: RequestValidationE
             body = await request.json()
 
             if not isinstance(body, dict):
-                errors.append({
+                error.append({
                     "field": "body",
                     "message": "بدنه درخواست باید یک JSON object باشد"
                 })
                 body_invalid = True
 
         except JSONDecodeError:
-            errors.append({
+            error.append({
                 "field": "body",
                 "message": "JSON نامعتبر است"
             })
             body_invalid = True
 
         except UnicodeDecodeError:
-            errors.append({
+            error.append({
                 "field": "body",
                 "message": "Encoding بدنه درخواست معتبر نیست"
             })
             body_invalid = True
 
     if body_invalid:
-        return JSONResponse(status_code=422, content={"errors": errors})
+        return JSONResponse(status_code=422, content={"error": error})
 
     # ---------- PYDANTIC ERRORS ----------
     for err in exc.errors():
@@ -90,12 +90,12 @@ async def validation_exception_handler(request: Request, exc: RequestValidationE
 
         field_name = loc[-1]
 
-        errors.append({
+        error.append({
             "field": field_name,
             "message": message
         })
 
-    return JSONResponse(status_code=422, content={"errors": errors})
+    return JSONResponse(status_code=422, content={"error": error})
 
 
 async def http_exception_handler(request: Request, exc: StarletteHTTPException):
@@ -110,7 +110,7 @@ async def http_exception_handler(request: Request, exc: StarletteHTTPException):
             return JSONResponse(
                 status_code=400,
                 content={
-                    "errors": [
+                    "error": [
                         {"field": "body", "message": error_messages["json_invalid"]}
                     ]
                 }
@@ -152,7 +152,7 @@ async def http_exception_handler(request: Request, exc: StarletteHTTPException):
         return JSONResponse(
             status_code=405,
             content={
-                "errors": [
+                "error": [
                     {"field": "method", "message": error_messages["method_not_allowed"]}
                 ]
             }

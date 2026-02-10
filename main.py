@@ -2,6 +2,7 @@ from app.core.exceptions import validation_exception_handler, http_exception_han
 from starlette.exceptions import HTTPException as StarletteHTTPException
 from app.api.v1 import auth, user, console, buffet, unitPrice
 from fastapi.exceptions import RequestValidationError
+from starlette.middleware.cors import CORSMiddleware
 from fastapi import FastAPI
 
 app = FastAPI(title="CafeGame", description="API for managing CafeGame", version="1.0.0", responses={
@@ -10,7 +11,7 @@ app = FastAPI(title="CafeGame", description="API for managing CafeGame", version
         "content": {
             "application/json": {
                 "example": {
-                    "errors": [
+                    "error": [
                         {"field": "نام فیلد", "message": "متن خطا"}
                     ]
                 }
@@ -34,7 +35,9 @@ app = FastAPI(title="CafeGame", description="API for managing CafeGame", version
         "content": {
             "application/json": {
                 "example": {
-                    "error": {"message": "متن خطا"}
+                    "error": [
+                        {"field": "نام فیلد", "message": "متن خطا"}
+                    ]
                 }
             }
         }
@@ -44,7 +47,9 @@ app = FastAPI(title="CafeGame", description="API for managing CafeGame", version
         "content": {
             "application/json": {
                 "example": {
-                    "error": {"message": "متن خطا"}
+                    "error": [
+                        {"field": "نام فیلد", "message": "متن خطا"}
+                    ]
                 }
             }
         }
@@ -54,12 +59,22 @@ app = FastAPI(title="CafeGame", description="API for managing CafeGame", version
         "content": {
             "application/json": {
                 "example": {
-                    "error": {"message": "متن خطا"}
+                    "error": [
+                        {"field": "نام فیلد", "message": "متن خطا"}
+                    ]
                 }
             }
         }
     }
 })
+
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=["*"],
+    allow_credentials=True,
+    allow_methods=["*"],
+    allow_headers=["*"],
+)
 
 app.include_router(auth.router)
 app.include_router(user.router)

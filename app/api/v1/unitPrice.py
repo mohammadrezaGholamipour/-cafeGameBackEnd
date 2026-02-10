@@ -60,13 +60,13 @@ def delete_unit_price(
     if not unit_price:
         raise HTTPException(
             status_code=status.HTTP_404_NOT_FOUND,
-            detail={"message": "قیمت واحد مورد نظر وجود ندارد"}
+            detail={"field":"UnitPrice","message": "قیمت واحد مورد نظر وجود ندارد"}
         )
 
     if unit_price.owner_id != current_user.id:
         raise HTTPException(
             status_code=status.HTTP_403_FORBIDDEN,
-            detail={"message": "این قیمت واحد مطعلق به شما نیست و اجازه حذف آن را ندارید"}
+            detail={"field":"UnitPrice","message": "این قیمت واحد مطعلق به شما نیست و اجازه حذف آن را ندارید"}
         )
 
     db.delete(unit_price)
