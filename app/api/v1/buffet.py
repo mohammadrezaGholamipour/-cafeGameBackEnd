@@ -67,7 +67,7 @@ def update_buffet(
 
 
 @router.get("/list", response_model=List[BuffetWithOwner])
-def list_buffets(db: Session = Depends(get_db)):
+def list_all_buffets(db: Session = Depends(get_db)):
     buffets = db.query(Buffet).all()
     return buffets
 
@@ -96,3 +96,16 @@ def delete_buffet(
 
     db.delete(buffet)
     db.commit()
+
+
+@router.get("/my-buffet", response_model=list[BuffetWithOutOwner])
+def list_my_buffet(
+        current_user: Annotated[User, Depends(get_current_user)],
+        db: Session = Depends(get_db),
+):
+    buffet = (
+        db.query(Buffet)
+        .filter(Buffet.owner_id == current_user.id)
+        .all()
+    )
+    return buffet

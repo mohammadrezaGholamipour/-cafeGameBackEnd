@@ -1,5 +1,5 @@
 from fastapi import APIRouter, Depends, status, HTTPException, Path
-from app.schemas.console import ConsoleWithOwner
+from app.schemas.console import ConsoleWithOwner,ConsoleWithOutOwner
 from app.core.security import get_current_user
 from app.models.console import Console
 from sqlalchemy.orm import Session
@@ -40,9 +40,8 @@ def create_console(
     return new_console
 
 
-
 @router.get("/list", response_model=list[ConsoleWithOwner])
-def list_consoles(db: Session = Depends(get_db)):
+def list_all_consoles(db: Session = Depends(get_db)):
     consoles = db.query(Console).all()
     return consoles
 
@@ -61,14 +60,27 @@ def delete_console(
     if not console:
         raise HTTPException(
             status_code=status.HTTP_404_NOT_FOUND,
-            detail={"field":"Console","message": "دستگاه مورد نظر وجود ندارد"}
+            detail={"field": "Console", "message": "دستگاه مورد نظر وجود ندارد"}
         )
 
     if console.owner_id != current_user.id:
         raise HTTPException(
             status_code=status.HTTP_403_FORBIDDEN,
-            detail={"field":"Console","message": "این دستگاه مطعلق به شما نیست و اجازه حذف آن را ندارید"}
+            detail={"field": "Console", "message": "این دستگاه مطعلق به شما نیست و اجازه حذف آن را ندارید"}
         )
 
     db.delete(console)
     db.commit()
+
+
+@router.get("/my-console", response_model=list[ConsoleWithOutOwner])
+def list_my_consoles(
+        current_user: Annotated[User, Depends(get_current_user)],
+        db: Session = Depends(get_db),
+):
+    consoles = (
+        db.query(Console)
+        .filter(Console.owner_id == current_user.id)
+        .all()
+    )
+    return consoles

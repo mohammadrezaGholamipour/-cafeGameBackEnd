@@ -1,4 +1,4 @@
-from app.schemas.unitPrice import UnitPriceCreate, UnitPriceWithOwner, UnitPriceUpdate
+from app.schemas.unitPrice import UnitPriceCreate, UnitPriceWithOwner,UnitPriceWithOutOwner
 from fastapi import APIRouter, Depends, HTTPException, status,Path
 from app.core.security import get_current_user
 from app.models.unitPrice import UnitPrice
@@ -7,7 +7,7 @@ from typing import List, Annotated
 from app.db.session import get_db
 from app.models.user import User
 
-router = APIRouter(prefix="/api/v1/unitPrice", tags=["UnitPrice"], dependencies=[Depends(get_current_user)])
+router = APIRouter(prefix="/api/v1/unit-price", tags=["UnitPrice"], dependencies=[Depends(get_current_user)])
 
 
 @router.post("/create", response_model=UnitPriceWithOwner, status_code=status.HTTP_201_CREATED)
@@ -40,7 +40,7 @@ def create_unit_price(
     return new_unit_price
 
 @router.get("/list", response_model=List[UnitPriceWithOwner])
-def list_unit_price(db: Session = Depends(get_db)):
+def list_all_unit_price(db: Session = Depends(get_db)):
     unit_prices = db.query(UnitPrice).all()
     return unit_prices
 
@@ -71,3 +71,15 @@ def delete_unit_price(
 
     db.delete(unit_price)
     db.commit()
+
+@router.get("/my-unit-price", response_model=list[UnitPriceWithOutOwner])
+def list_my_unit_price(
+        current_user: Annotated[User, Depends(get_current_user)],
+        db: Session = Depends(get_db),
+):
+    unit_price = (
+        db.query(UnitPrice)
+        .filter(UnitPrice.owner_id == current_user.id)
+        .all()
+    )
+    return unit_price
