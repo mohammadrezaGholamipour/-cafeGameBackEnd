@@ -9,7 +9,7 @@ error_messages = {
     # body/query errors
     "string_too_short": "طول مقدار وارد شده کمتر از حد مجاز است",
     "string_type": "مقدار باید از نوع متن باشد",
-    "missing": "هیچ اطلاعاتی ارسال نکرده اید",
+    "missing": "اطلاعات ارسال شده کامل نمیباشد",
     "enum": "مقدار واردشده معتبر نیست",
     "datetime_type": "فرمت تاریخ و زمان معتبر نیست",
     "datetime_from_date_parsing": "فرمت تاریخ و زمان معتبر نیست",

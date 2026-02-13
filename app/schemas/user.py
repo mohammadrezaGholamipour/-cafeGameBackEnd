@@ -102,8 +102,9 @@ class UserOut(BaseModel):
     email: str
     mobile: str
     unitPrice: list["UnitPriceWithOutOwner"]
-    consoles: list["ConsoleWithOutOwner"]
+    console: list["ConsoleWithOutOwner"]
     buffet: list["BuffetWithOutOwner"]
+    bills: list["BillWithOutOwner"]
     model_config = {
         "from_attributes": True
     }
@@ -122,7 +123,9 @@ class UserWithOutDetails(BaseModel):
 from app.schemas.unitPrice import UnitPriceWithOutOwner
 from app.schemas.console import ConsoleWithOutOwner
 from app.schemas.buffet import BuffetWithOutOwner
+from app.schemas.bill import BillWithOutOwner
 
 UnitPriceWithOutOwner.model_rebuild()
 ConsoleWithOutOwner.model_rebuild()
 BuffetWithOutOwner.model_rebuild()
+BillWithOutOwner.model_rebuild()

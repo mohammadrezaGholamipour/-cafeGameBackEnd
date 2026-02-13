@@ -1,4 +1,6 @@
 from fastapi import APIRouter, Depends, status, HTTPException, Path
+from sqlalchemy import Integer
+
 from app.schemas.console import ConsoleWithOwner,ConsoleWithOutOwner
 from app.core.security import get_current_user
 from app.models.console import Console
@@ -66,11 +68,29 @@ def delete_console(
     if console.owner_id != current_user.id:
         raise HTTPException(
             status_code=status.HTTP_403_FORBIDDEN,
-            detail={"field": "Console", "message": "این دستگاه مطعلق به شما نیست و اجازه حذف آن را ندارید"}
+            detail={"field": "Console", "message": "این دستگاه متعلق به شما نیست"}
         )
+
+    deleted_number = int(console.name)
 
     db.delete(console)
     db.commit()
+
+    # ↓↓↓ این بخش مهم است ↓↓↓
+    consoles_to_update = (
+        db.query(Console)
+        .filter(
+            Console.owner_id == current_user.id,
+            Console.name.cast(Integer) > deleted_number
+        )
+        .all()
+    )
+
+    for c in consoles_to_update:
+        c.name = str(int(c.name) - 1)
+
+    db.commit()
+
 
 
 @router.get("/my-console", response_model=list[ConsoleWithOutOwner])

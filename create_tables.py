@@ -1,4 +1,4 @@
-from app.models import user, console, buffet,unitPrice
+from app.models import user, console, buffet, unitPrice, bill
 from app.db.session import engine
 from app.db.base import Base
 
