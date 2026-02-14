@@ -6,6 +6,7 @@ class BillCreate(BaseModel):
     console_id: int
     unit_price_id: int
 
+
 class BillUpdate(BaseModel):
     console_id: int | None = None
     unit_price_id: int | None = None
@@ -15,15 +16,31 @@ class BillUpdate(BaseModel):
     total_price: int | None = None
 
 
-class BillWithOutOwner(BaseModel):
+class BillWithOutDetails(BaseModel):
+    id: int
+    owner_id: int
+    console_id: int
+    unit_price_id: int
+    start_time: datetime
+    end_time: datetime | None
+    play_price: int | None
+    total_price: int | None
+
+    model_config = {
+        "from_attributes": True
+    }
+
+
+class BillWithOwner(BaseModel):
     id: int
     owner_id: int
     console: "ConsoleWithOutOwner"
     unit_price: "UnitPriceWithOutOwner"
+    owner: "UserWithOutDetails"
     start_time: datetime
     end_time: datetime | None
-    play_price: int
-    total_price: int
+    play_price: int | None
+    total_price: int | None
 
     model_config = {
         "from_attributes": True
