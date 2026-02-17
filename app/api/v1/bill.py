@@ -21,7 +21,7 @@ router = APIRouter(
 @router.post(
     "/create",
     response_model=BillWithOutDetails,
-    status_code=status.HTTP_201_CREATED,
+    status_code=status.HTTP_201_CREATED
 )
 def create_bill(
         bill_data: BillCreate,
