@@ -1,26 +1,24 @@
+from typing import Optional
+
 from pydantic import BaseModel
 from datetime import datetime
 
 
 class BillCreate(BaseModel):
     console_id: int
-    unit_price_id: int
+    unit_price_amount: int
 
 
 class BillUpdate(BaseModel):
     console_id: int | None = None
-    unit_price_id: int | None = None
+    unit_price_amount: int | None = None
     start_time: datetime | None = None
-    end_time: datetime | None = None
-    play_price: int | None = None
-    total_price: int | None = None
-
 
 class BillWithOutDetails(BaseModel):
     id: int
     owner_id: int
     console_id: int
-    unit_price_id: int
+    unit_price_amount: int
     start_time: datetime
     end_time: datetime | None
     play_price: int | None
@@ -35,7 +33,7 @@ class BillWithOwner(BaseModel):
     id: int
     owner_id: int
     console: "ConsoleWithOutOwner"
-    unit_price: "UnitPriceWithOutOwner"
+    unit_price_amount: "UnitPriceWithOutOwner"
     owner: "UserWithOutDetails"
     start_time: datetime
     end_time: datetime | None

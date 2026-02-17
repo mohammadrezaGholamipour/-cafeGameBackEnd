@@ -18,8 +18,6 @@ router = APIRouter(
 )
 
 
-
-
 @router.post(
     "/create",
     response_model=BillWithOutDetails,
@@ -84,7 +82,7 @@ def create_bill(
     new_bill = Bill(
         owner_id=current_user.id,
         console_id=bill_data.console_id,
-        unit_price_id=bill_data.unit_price_id,
+        unit_price_amount=bill_data.unit_price_id,
         start_time=datetime.now(UTC)
     )
 

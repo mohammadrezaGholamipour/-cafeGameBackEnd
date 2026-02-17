@@ -1,6 +1,4 @@
 from fastapi import APIRouter, Depends, status, HTTPException, Path
-from sqlalchemy import Integer
-
 from app.schemas.console import ConsoleWithOwner,ConsoleWithOutOwner
 from app.core.security import get_current_user
 from app.models.console import Console
@@ -21,14 +19,20 @@ def create_console(
         current_user: Annotated[User, Depends(get_current_user)],
         db: Session = Depends(get_db),
 ):
-    last_console = (
-        db.query(Console)
-        .filter(Console.owner_id == current_user.id)
-        .order_by(Console.id.desc())
-        .first()
+    active_numbers = (
+        db.query(Console.name)
+        .filter(
+            Console.owner_id == current_user.id,
+            Console.is_deleted == False
+        )
+        .all()
     )
 
-    next_number = 1 if not last_console else int(last_console.name) + 1
+    used_numbers = {int(row[0]) for row in active_numbers}
+
+    next_number = 1
+    while next_number in used_numbers:
+        next_number += 1
 
     new_console = Console(
         name=str(next_number),
@@ -40,6 +44,7 @@ def create_console(
     db.refresh(new_console)
 
     return new_console
+
 
 
 @router.get("/list", response_model=list[ConsoleWithOwner])
@@ -57,7 +62,11 @@ def delete_console(
         current_user: Annotated[User, Depends(get_current_user)],
         db: Session = Depends(get_db),
 ):
-    console = db.query(Console).filter(Console.id == console_id).first()
+    console = (
+        db.query(Console)
+        .filter(Console.id == console_id)
+        .first()
+    )
 
     if not console:
         raise HTTPException(
@@ -71,26 +80,11 @@ def delete_console(
             detail={"field": "Console", "message": "این دستگاه متعلق به شما نیست"}
         )
 
-    deleted_number = int(console.name)
+    if console.is_deleted:
+        return
 
-    db.delete(console)
+    console.is_deleted = True
     db.commit()
-
-    # ↓↓↓ این بخش مهم است ↓↓↓
-    consoles_to_update = (
-        db.query(Console)
-        .filter(
-            Console.owner_id == current_user.id,
-            Console.name.cast(Integer) > deleted_number
-        )
-        .all()
-    )
-
-    for c in consoles_to_update:
-        c.name = str(int(c.name) - 1)
-
-    db.commit()
-
 
 
 @router.get("/my-console", response_model=list[ConsoleWithOutOwner])
