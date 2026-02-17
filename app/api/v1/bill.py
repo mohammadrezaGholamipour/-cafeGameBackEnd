@@ -18,8 +18,6 @@ router = APIRouter(
 )
 
 
-
-
 @router.post(
     "/create",
     response_model=BillWithOutDetails,
