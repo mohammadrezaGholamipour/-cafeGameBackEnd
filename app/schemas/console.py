@@ -4,6 +4,7 @@ from pydantic import BaseModel
 class ConsoleWithOutOwner(BaseModel):
     id: int
     name: str
+    is_deleted:bool
     model_config = {
         "from_attributes": True
     }
@@ -14,6 +15,7 @@ class ConsoleWithOwner(BaseModel):
     name: str
     owner_id: int
     owner:"UserWithOutDetails"
+    is_deleted: bool
     model_config = {
         "from_attributes": True
     }

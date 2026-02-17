@@ -21,7 +21,7 @@ router = APIRouter(
 @router.post(
     "/create",
     response_model=BillWithOutDetails,
-    status_code=status.HTTP_201_CREATED
+    status_code=status.HTTP_201_CREATED,
 )
 def create_bill(
         bill_data: BillCreate,
@@ -30,14 +30,17 @@ def create_bill(
 ):
     console = (
         db.query(Console)
-        .filter(Console.id == bill_data.console_id)
+        .filter(
+            Console.id == bill_data.console_id,
+            Console.is_deleted == False
+        )
         .first()
     )
 
     if not console:
         raise HTTPException(
             status_code=status.HTTP_404_NOT_FOUND,
-            detail={"field": "Console", "message": "دستگاه یافت نشد"}
+            detail={"field": "Console", "message": "دستگاه یافت نشد یا حذف شده است"}
         )
 
     if console.owner_id != current_user.id:
@@ -79,10 +82,11 @@ def create_bill(
             detail={"field": "UnitPrice", "message": "این قیمت واحد متعلق به شما نیست"}
         )
 
+
     new_bill = Bill(
         owner_id=current_user.id,
-        console_id=bill_data.console_id,
-        unit_price_amount=bill_data.unit_price_id,
+        console_id=console.id,
+        unit_price_amount=unit_price.price,
         start_time=datetime.now(UTC)
     )
 
@@ -91,6 +95,7 @@ def create_bill(
     db.refresh(new_bill)
 
     return new_bill
+
 
 
 
