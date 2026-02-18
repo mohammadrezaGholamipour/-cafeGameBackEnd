@@ -1,8 +1,8 @@
-from typing import Optional
-
-from pydantic import BaseModel
+from pydantic import BaseModel, field_serializer
+from zoneinfo import ZoneInfo
 from datetime import datetime
 
+TEHRAN_TZ = ZoneInfo("Asia/Tehran")
 
 class BillCreate(BaseModel):
     console_id: int
@@ -18,6 +18,7 @@ class BillWithOutDetails(BaseModel):
     id: int
     owner_id: int
     console_id: int
+    console: "ConsoleWithOutOwner"
     unit_price_amount: int
     start_time: datetime
     end_time: datetime | None
@@ -28,13 +29,18 @@ class BillWithOutDetails(BaseModel):
         "from_attributes": True
     }
 
+    @field_serializer("start_time", "end_time")
+    def convert_to_tehran(self, value: datetime | None):
+        if value is None:
+            return None
+        return value.astimezone(TEHRAN_TZ).isoformat()
 
 class BillWithOwner(BaseModel):
     id: int
     owner_id: int
     console: "ConsoleWithOutOwner"
-    unit_price_amount: "UnitPriceWithOutOwner"
     owner: "UserWithOutDetails"
+    unit_price_amount: int
     start_time: datetime
     end_time: datetime | None
     play_price: int | None
@@ -44,6 +50,11 @@ class BillWithOwner(BaseModel):
         "from_attributes": True
     }
 
+    @field_serializer("start_time", "end_time")
+    def convert_to_tehran(self, value: datetime | None):
+        if value is None:
+            return None
+        return value.astimezone(TEHRAN_TZ).isoformat()
 
 from app.schemas.unitPrice import UnitPriceWithOutOwner
 from app.schemas.console import ConsoleWithOutOwner

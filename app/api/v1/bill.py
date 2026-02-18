@@ -10,6 +10,8 @@ from app.db.session import get_db
 from app.models.user import User
 from app.models.bill import Bill
 from typing import Annotated
+from fastapi import Path
+from math import ceil
 
 router = APIRouter(
     prefix="/api/v1/bill",
@@ -66,7 +68,7 @@ def create_bill(
 
     unit_price = (
         db.query(UnitPrice)
-        .filter(UnitPrice.id == bill_data.unit_price_id)
+        .filter(UnitPrice.price == bill_data.unit_price_amount)
         .first()
     )
 
@@ -130,3 +132,55 @@ def list_my_bills(
     )
     return bills
 
+@router.post(
+    "/{bill_id}/close",
+    response_model=BillWithOutDetails
+)
+def close_bill(
+        bill_id: Annotated[int, Path(..., gt=0)],
+        current_user: Annotated[User, Depends(get_current_user)],
+        db: Session = Depends(get_db),
+):
+    bill = (
+        db.query(Bill)
+        .filter(
+            Bill.id == bill_id,
+            Bill.owner_id == current_user.id
+        )
+        .first()
+    )
+
+    if not bill:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail={"field": "Bill", "message": "فاکتور یافت نشد"}
+        )
+
+    if bill.end_time is not None:
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail={"field": "Bill", "message": "این فاکتور قبلا بسته شده است"}
+        )
+
+    now = datetime.now(UTC)
+
+    duration_seconds = (now - bill.start_time).total_seconds()
+    duration_hours = duration_seconds / 3600
+
+
+    if duration_hours <= 1:
+        raw_price = bill.unit_price_amount
+    else:
+        raw_price = duration_hours * bill.unit_price_amount
+
+
+    rounded_price = ceil(raw_price / 1000) * 1000
+
+    bill.end_time = now
+    bill.play_price = int(rounded_price)
+    bill.total_price = int(rounded_price)
+
+    db.commit()
+    db.refresh(bill)
+
+    return bill
