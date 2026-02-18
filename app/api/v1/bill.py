@@ -5,7 +5,7 @@ from fastapi import HTTPException, status
 from fastapi import APIRouter, Depends
 from app.models.console import Console
 from sqlalchemy.orm import Session
-from datetime import datetime, UTC
+from datetime import datetime, timezone
 from app.db.session import get_db
 from app.models.user import User
 from app.models.bill import Bill
@@ -89,7 +89,7 @@ def create_bill(
         owner_id=current_user.id,
         console_id=console.id,
         unit_price_amount=unit_price.price,
-        start_time=datetime.now(UTC)
+        start_time = datetime.now(timezone.utc)
     )
 
     db.add(new_bill)
@@ -132,7 +132,7 @@ def list_my_bills(
     )
     return bills
 
-@router.post(
+@router.patch(
     "/{bill_id}/close",
     response_model=BillWithOutDetails
 )
@@ -162,9 +162,13 @@ def close_bill(
             detail={"field": "Bill", "message": "این فاکتور قبلا بسته شده است"}
         )
 
-    now = datetime.now(UTC)
+    now = datetime.now(timezone.utc)
 
-    duration_seconds = (now - bill.start_time).total_seconds()
+    start_time = bill.start_time
+    if start_time.tzinfo is None:
+        start_time = start_time.replace(tzinfo=timezone.utc)
+
+    duration_seconds = (now - start_time).total_seconds()
     duration_hours = duration_seconds / 3600
 
 
@@ -184,3 +188,25 @@ def close_bill(
     db.refresh(bill)
 
     return bill
+
+@router.get(
+    "/my-open-bills",
+    response_model=list[BillWithOutDetails],
+    status_code=status.HTTP_200_OK
+)
+def list_my_open_bills(
+        current_user: Annotated[User, Depends(get_current_user)],
+        db: Session = Depends(get_db),
+):
+
+    open_bills = (
+        db.query(Bill)
+        .filter(
+            Bill.owner_id == current_user.id,
+            Bill.end_time.is_(None)
+        )
+        .order_by(Bill.id.desc())
+        .all()
+    )
+
+    return open_bills
