@@ -84,12 +84,11 @@ def create_bill(
             detail={"field": "UnitPrice", "message": "این قیمت واحد متعلق به شما نیست"}
         )
 
-
     new_bill = Bill(
         owner_id=current_user.id,
         console_id=console.id,
         unit_price_amount=unit_price.price,
-        start_time = datetime.now(timezone.utc)
+        start_time=datetime.now(timezone.utc)
     )
 
     db.add(new_bill)
@@ -99,11 +98,10 @@ def create_bill(
     return new_bill
 
 
-
-
 @router.get(
     "/list",
-    response_model=list[BillWithOwner]
+    response_model=list[BillWithOwner],
+    status_code=status.HTTP_200_OK
 )
 def list_all_bills(
         db: Session = Depends(get_db),
@@ -116,10 +114,11 @@ def list_all_bills(
     return bills
 
 
-
 @router.get(
     "/my-bills",
-    response_model=list[BillWithOutDetails]
+    response_model=list[BillWithOutDetails],
+    status_code=status.HTTP_200_OK
+
 )
 def list_my_bills(
         current_user: Annotated[User, Depends(get_current_user)],
@@ -132,9 +131,11 @@ def list_my_bills(
     )
     return bills
 
+
 @router.patch(
     "/{bill_id}/close",
-    response_model=BillWithOutDetails
+    response_model=BillWithOutDetails,
+    status_code=status.HTTP_204_NO_CONTENT
 )
 def close_bill(
         bill_id: Annotated[int, Path(..., gt=0)],
@@ -171,12 +172,10 @@ def close_bill(
     duration_seconds = (now - start_time).total_seconds()
     duration_hours = duration_seconds / 3600
 
-
     if duration_hours <= 1:
         raw_price = bill.unit_price_amount
     else:
         raw_price = duration_hours * bill.unit_price_amount
-
 
     rounded_price = ceil(raw_price / 1000) * 1000
 
@@ -187,7 +186,6 @@ def close_bill(
     db.commit()
     db.refresh(bill)
 
-    return bill
 
 @router.get(
     "/my-open-bills",
@@ -198,7 +196,6 @@ def list_my_open_bills(
         current_user: Annotated[User, Depends(get_current_user)],
         db: Session = Depends(get_db),
 ):
-
     open_bills = (
         db.query(Bill)
         .filter(
