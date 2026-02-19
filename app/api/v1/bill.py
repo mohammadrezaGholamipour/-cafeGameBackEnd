@@ -1,11 +1,13 @@
-from app.schemas.bill import BillCreate, BillWithOwner, BillWithOutDetails
+from app.models.billFood import BillFood
+from app.models.buffet import Buffet
+from app.schemas.bill import BillCreate, BillWithOwner, BillWithOutDetails, BillUpdate
 from app.core.security import get_current_user
 from app.models.unitPrice import UnitPrice
 from fastapi import HTTPException, status
 from fastapi import APIRouter, Depends
 from app.models.console import Console
 from sqlalchemy.orm import Session
-from datetime import datetime, timezone
+from datetime import datetime, timezone, timedelta
 from app.db.session import get_db
 from app.models.user import User
 from app.models.bill import Bill
@@ -134,7 +136,6 @@ def list_my_bills(
 
 @router.patch(
     "/{bill_id}/close",
-    response_model=BillWithOutDetails,
     status_code=status.HTTP_204_NO_CONTENT
 )
 def close_bill(
@@ -185,6 +186,7 @@ def close_bill(
 
     db.commit()
     db.refresh(bill)
+    return
 
 
 @router.get(
@@ -207,3 +209,108 @@ def list_my_open_bills(
     )
 
     return open_bills
+
+
+@router.patch("/update-bill/{bill_id}", status_code=status.HTTP_204_NO_CONTENT)
+def update_bill(
+        bill_id: Annotated[int, Path(..., gt=0)],
+        bill_data: BillUpdate,
+        current_user: Annotated[User, Depends(get_current_user)],
+        db: Session = Depends(get_db),
+):
+    bill = db.query(Bill).filter(
+        Bill.id == bill_id,
+        Bill.owner_id == current_user.id
+    ).first()
+
+    if not bill:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail={"field": "Bill", "message": "فاکتور یافت نشد"}
+        )
+
+    update_data = bill_data.model_dump(exclude_unset=True)
+
+    # تغییر زمان شروع
+    if "start_time_offset_minutes" in update_data:
+        if bill.end_time is not None:
+            raise HTTPException(
+                status_code=status.HTTP_400_BAD_REQUEST,
+                detail={"field": "Bill", "message": "فاکتور بسته شده است و امکان تغییر زمان وجود ندارد"}
+            )
+
+        offset = update_data.pop("start_time_offset_minutes")
+        start_time = bill.start_time
+
+        if start_time.tzinfo is None:
+            start_time = start_time.replace(tzinfo=timezone.utc)
+
+        bill.start_time = start_time - timedelta(minutes=offset)
+
+    # اضافه یا جایگزینی خوراکی‌ها
+    if "foods" in update_data:
+        if bill.end_time is not None:
+            raise HTTPException(
+                status_code=status.HTTP_400_BAD_REQUEST,
+                detail={"field": "Bill", "message": "فاکتور بسته شده است و امکان افزودن خوراکی وجود ندارد"}
+            )
+
+        foods = update_data.pop("foods")
+
+        # پاک کردن همه خوراکی‌های قبلی
+        db.query(BillFood).filter(BillFood.bill_id == bill.id).delete(synchronize_session=False)
+
+        # افزودن خوراکی‌های جدید (حتی اگر لیست خالی باشد، همه قبلی‌ها پاک می‌شوند)
+        for food in foods:
+            buffet_food = db.query(Buffet).filter(Buffet.id == food["food_id"]).first()
+            if not buffet_food:
+                raise HTTPException(
+                    status_code=404,
+                    detail={"field": "Food", "message": "خوراکی یافت نشد"}
+                )
+
+            new_bill_food = BillFood(
+                bill_id=bill.id,
+                food_id=buffet_food.id,
+                count=food["count"],
+                price=buffet_food.price,
+                name=buffet_food.name
+            )
+            db.add(new_bill_food)
+
+    for key, value in update_data.items():
+        setattr(bill, key, value)
+
+    db.commit()
+    db.refresh(bill)
+
+
+
+@router.delete(
+    "/remove-bill/{bill_id}",
+    status_code=status.HTTP_204_NO_CONTENT
+)
+def delete_bill(
+        bill_id: Annotated[int, Path(..., gt=0)],
+        current_user: Annotated[User, Depends(get_current_user)],
+        db: Session = Depends(get_db)
+):
+    bill = db.query(Bill).filter(
+        Bill.id == bill_id,
+        Bill.owner_id == current_user.id
+    ).first()
+
+    if not bill:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail={"field": "Bill", "message": "فاکتور یافت نشد"}
+        )
+
+    if bill.end_time is not None:
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail={"field": "Bill", "message": "فاکتور بسته شده و نمی‌توان حذف کرد"}
+        )
+
+    db.delete(bill)
+    db.commit()

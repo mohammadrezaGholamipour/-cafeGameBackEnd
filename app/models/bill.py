@@ -14,6 +14,14 @@ class Bill(Base):
     end_time = Column(DateTime(timezone=True), nullable=True)
     play_price = Column(Integer, nullable=True, default=0)
     total_price = Column(Integer, nullable=True, default=0)
+    payment_method = Column(Integer, nullable=True, default=0)
     owner = relationship("User", back_populates="bills")
     console = relationship("Console")
+    bill_foods = relationship(
+        "BillFood",
+        back_populates="bill",
+        cascade="all, delete-orphan"
+    )
 
+
+from app.models.billFood import BillFood
