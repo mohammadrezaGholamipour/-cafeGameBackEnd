@@ -1,3 +1,5 @@
+from fastapi.params import Query
+
 from app.schemas.buffet import BuffetCreate, BuffetWithOutOwner, BuffetWithOwner, BuffetUpdate
 from fastapi import APIRouter, Depends, HTTPException, status, Path
 from app.core.security import get_current_user
@@ -102,10 +104,12 @@ def delete_buffet(
 def list_my_buffet(
         current_user: Annotated[User, Depends(get_current_user)],
         db: Session = Depends(get_db),
+        name: Annotated[str | None, Query()] = None
 ):
-    buffet = (
-        db.query(Buffet)
-        .filter(Buffet.owner_id == current_user.id)
-        .all()
-    )
+    query = db.query(Buffet).filter(Buffet.owner_id == current_user.id)
+
+    if name:
+        query = query.filter(Buffet.name.ilike(f"%{name}%"))
+
+    buffet = query.all()
     return buffet
