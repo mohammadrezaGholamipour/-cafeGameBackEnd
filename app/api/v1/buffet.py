@@ -1,5 +1,6 @@
 from fastapi.params import Query
 
+from app.core.dropBox import upload_db
 from app.schemas.buffet import BuffetCreate, BuffetWithOutOwner, BuffetWithOwner, BuffetUpdate
 from fastapi import APIRouter, Depends, HTTPException, status, Path
 from app.core.security import get_current_user
@@ -36,6 +37,7 @@ def create_buffet(
     db.add(new_buffet)
     db.commit()
     db.refresh(new_buffet)
+    upload_db()
     return new_buffet
 
 
@@ -65,6 +67,7 @@ def update_buffet(
 
     db.commit()
     db.refresh(buffet)
+    upload_db()
     return buffet
 
 
@@ -98,7 +101,7 @@ def delete_buffet(
 
     db.delete(buffet)
     db.commit()
-
+    upload_db()
 
 @router.get("/my-buffet", response_model=list[BuffetWithOutOwner])
 def list_my_buffet(

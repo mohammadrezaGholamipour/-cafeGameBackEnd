@@ -1,3 +1,4 @@
+from app.core.dropBox import upload_db
 from app.schemas.unitPrice import UnitPriceCreate, UnitPriceWithOwner,UnitPriceWithOutOwner
 from fastapi import APIRouter, Depends, HTTPException, status,Path
 from app.core.security import get_current_user
@@ -37,6 +38,7 @@ def create_unit_price(
     db.add(new_unit_price)
     db.commit()
     db.refresh(new_unit_price)
+    upload_db()
     return new_unit_price
 
 @router.get("/list", response_model=List[UnitPriceWithOwner])
@@ -71,6 +73,7 @@ def delete_unit_price(
 
     db.delete(unit_price)
     db.commit()
+    upload_db()
 
 @router.get("/my-unit-price", response_model=list[UnitPriceWithOutOwner])
 def list_my_unit_price(

@@ -1,4 +1,6 @@
 from fastapi import APIRouter, Depends, status, HTTPException, Path
+
+from app.core.dropBox import upload_db
 from app.core.security import get_current_user
 from app.schemas.user import UserOut, UserUpdate
 from sqlalchemy.orm import Session
@@ -34,6 +36,7 @@ def update_user(
 
     db.commit()
     db.refresh(user)
+    upload_db()
     return user
 
 @router.delete("/{user_id}", status_code=status.HTTP_204_NO_CONTENT)
@@ -48,5 +51,5 @@ def remove_user(user_id: Annotated[int, Path(..., gt=0)], db: Session = Depends(
 
     db.delete(user)
     db.commit()
-
+    upload_db()
     return None

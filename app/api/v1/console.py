@@ -1,4 +1,6 @@
 from fastapi import APIRouter, Depends, status, HTTPException, Path
+
+from app.core.dropBox import upload_db
 from app.schemas.console import ConsoleWithOwner,ConsoleWithOutOwner
 from app.core.security import get_current_user
 from app.models.console import Console
@@ -42,7 +44,7 @@ def create_console(
     db.add(new_console)
     db.commit()
     db.refresh(new_console)
-
+    upload_db()
     return new_console
 
 
@@ -85,6 +87,7 @@ def delete_console(
 
     console.is_deleted = True
     db.commit()
+    upload_db()
 
 
 @router.get("/my-console", response_model=list[ConsoleWithOutOwner])

@@ -1,3 +1,4 @@
+from app.core.dropBox import upload_db
 from app.models.billFood import BillFood
 from app.models.buffet import Buffet
 from app.schemas.bill import BillCreate, BillWithOwner, BillWithOutDetails, BillUpdate
@@ -96,7 +97,7 @@ def create_bill(
     db.add(new_bill)
     db.commit()
     db.refresh(new_bill)
-
+    upload_db()
     return new_bill
 
 
@@ -186,6 +187,7 @@ def close_bill(
 
     db.commit()
     db.refresh(bill)
+    upload_db()
     return
 
 
@@ -283,6 +285,7 @@ def update_bill(
 
     db.commit()
     db.refresh(bill)
+    upload_db()
 
 
 
@@ -314,3 +317,4 @@ def delete_bill(
 
     db.delete(bill)
     db.commit()
+    upload_db()
