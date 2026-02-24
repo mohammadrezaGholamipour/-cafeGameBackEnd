@@ -73,7 +73,6 @@ app = FastAPI(title="CafeGame", description="API for managing CafeGame", version
     }
 })
 
-uvicorn.run("app", host="0.0.0.0", reload=True)
 
 download_db()
 
@@ -94,3 +93,7 @@ app.include_router(bill.router)
 
 app.add_exception_handler(RequestValidationError, validation_exception_handler)
 app.add_exception_handler(StarletteHTTPException, http_exception_handler)
+
+
+if __name__ == "__main__":
+    uvicorn.run("main:app", host="0.0.0.0", port=8000, reload=True)
