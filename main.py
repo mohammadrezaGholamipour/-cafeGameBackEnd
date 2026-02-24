@@ -5,8 +5,6 @@ from fastapi.exceptions import RequestValidationError
 from starlette.middleware.cors import CORSMiddleware
 from app.core.dropBox import download_db
 from fastapi import FastAPI
-import uvicorn
-import os
 
 
 
@@ -73,8 +71,6 @@ app = FastAPI(title="CafeGame", description="API for managing CafeGame", version
     }
 })
 
-port = int(os.environ.get("PORT", 0))
-uvicorn.run("app", host="0.0.0.0", port=port, reload=True)
 
 download_db()
 
