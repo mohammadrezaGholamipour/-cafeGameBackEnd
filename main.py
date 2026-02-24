@@ -73,7 +73,7 @@ app = FastAPI(title="CafeGame", description="API for managing CafeGame", version
     }
 })
 
-port = int(os.environ.get("PORT", 8080))
+port = int(os.environ.get("PORT", 0))
 uvicorn.run("app", host="0.0.0.0", port=port, reload=True)
 
 download_db()
