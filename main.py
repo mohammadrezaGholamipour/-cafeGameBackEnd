@@ -1,4 +1,3 @@
-
 from app.core.exceptions import validation_exception_handler, http_exception_handler
 from starlette.exceptions import HTTPException as StarletteHTTPException
 from app.api.v1 import auth, user, console, buffet, unitPrice,bill
@@ -7,6 +6,7 @@ from starlette.middleware.cors import CORSMiddleware
 from app.core.dropBox import download_db
 from fastapi import FastAPI
 import uvicorn
+import os
 
 
 
@@ -73,9 +73,8 @@ app = FastAPI(title="CafeGame", description="API for managing CafeGame", version
     }
 })
 
-import os
 port = int(os.environ.get("PORT", 8080))
-uvicorn.run(app, host="127.0.0.1", port=port)
+uvicorn.run(app, host="0.0.0.0", port=port, reload=True)
 
 download_db()
 
