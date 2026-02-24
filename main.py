@@ -6,6 +6,13 @@ from starlette.middleware.cors import CORSMiddleware
 from app.core.dropBox import download_db
 from fastapi import FastAPI
 
+import os
+import uvicorn
+
+if __name__ == "__main__":
+    port = int(os.environ.get("PORT", 8080))
+    uvicorn.run("main:app", host="0.0.0.0", port=port)
+
 app = FastAPI(title="CafeGame", description="API for managing CafeGame", version="1.0.0", responses={
     422: {
         "description": "Validation Error Example",
