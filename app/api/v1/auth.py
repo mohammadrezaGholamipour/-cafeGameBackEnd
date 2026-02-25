@@ -2,14 +2,14 @@ from app.core.security import hash_password, verify_password, create_access_toke
 from fastapi import APIRouter, Depends, HTTPException, status
 from fastapi.security import OAuth2PasswordRequestForm
 from app.schemas.user import UserCreate, UserOut
-from app.core.dropBox import upload_db
+# from app.core.dropBox import upload_db
 from sqlalchemy.orm import Session
 from app.db.session import get_db
 from app.models.user import User
 from pydantic import BaseModel
 from typing import Annotated
 
-router = APIRouter(prefix="/api/v1/auth", tags=["Auth"])
+router = APIRouter(prefix="/cafe-game-api/v1/auth", tags=["Auth"])
 
 
 class TokenResponse(BaseModel):
@@ -61,7 +61,7 @@ def register(user: UserCreate, db: Session = Depends(get_db)):
     db.add(new_user)
     db.commit()
     db.refresh(new_user)
-    upload_db()
+    # upload_db()
 
     return new_user
 

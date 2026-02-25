@@ -1,16 +1,16 @@
-from fastapi.params import Query
-
-from app.core.dropBox import upload_db
 from app.schemas.buffet import BuffetCreate, BuffetWithOutOwner, BuffetWithOwner, BuffetUpdate
 from fastapi import APIRouter, Depends, HTTPException, status, Path
 from app.core.security import get_current_user
+# from app.core.dropBox import upload_db
 from app.models.buffet import Buffet
 from sqlalchemy.orm import Session
 from typing import List, Annotated
 from app.db.session import get_db
 from app.models.user import User
+from fastapi.params import Query
 
-router = APIRouter(prefix="/api/v1/buffet", tags=["Buffet"], dependencies=[Depends(get_current_user)])
+
+router = APIRouter(prefix="/cafe-game-api/v1/buffet", tags=["Buffet"], dependencies=[Depends(get_current_user)])
 
 
 @router.post("/create", response_model=BuffetWithOutOwner, status_code=status.HTTP_201_CREATED)
@@ -37,7 +37,7 @@ def create_buffet(
     db.add(new_buffet)
     db.commit()
     db.refresh(new_buffet)
-    upload_db()
+    # upload_db()
     return new_buffet
 
 
@@ -67,7 +67,7 @@ def update_buffet(
 
     db.commit()
     db.refresh(buffet)
-    upload_db()
+    # upload_db()
     return buffet
 
 
@@ -101,7 +101,7 @@ def delete_buffet(
 
     db.delete(buffet)
     db.commit()
-    upload_db()
+    # upload_db()
 
 @router.get("/my-buffet", response_model=list[BuffetWithOutOwner])
 def list_my_buffet(

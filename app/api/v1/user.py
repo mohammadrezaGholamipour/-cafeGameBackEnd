@@ -1,14 +1,14 @@
 from fastapi import APIRouter, Depends, status, HTTPException, Path
-
-from app.core.dropBox import upload_db
-from app.core.security import get_current_user
 from app.schemas.user import UserOut, UserUpdate
+from app.core.security import get_current_user
+# from app.core.dropBox import upload_db
 from sqlalchemy.orm import Session
 from app.db.session import get_db
 from app.models.user import User
 from typing import Annotated
 
-router = APIRouter(prefix="/api/v1/user", tags=["User"], dependencies=[Depends(get_current_user)])
+
+router = APIRouter(prefix="/cafe-game-api/v1/user", tags=["User"], dependencies=[Depends(get_current_user)])
 
 
 @router.get("/list", response_model=list[UserOut])
@@ -36,7 +36,7 @@ def update_user(
 
     db.commit()
     db.refresh(user)
-    upload_db()
+    # upload_db()
     return user
 
 @router.delete("/{user_id}", status_code=status.HTTP_204_NO_CONTENT)
@@ -51,5 +51,5 @@ def remove_user(user_id: Annotated[int, Path(..., gt=0)], db: Session = Depends(
 
     db.delete(user)
     db.commit()
-    upload_db()
+    # upload_db()
     return None

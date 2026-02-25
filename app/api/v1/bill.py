@@ -1,14 +1,14 @@
-from app.core.dropBox import upload_db
-from app.models.billFood import BillFood
-from app.models.buffet import Buffet
 from app.schemas.bill import BillCreate, BillWithOwner, BillWithOutDetails, BillUpdate
+from datetime import datetime, timezone, timedelta
 from app.core.security import get_current_user
 from app.models.unitPrice import UnitPrice
 from fastapi import HTTPException, status
+from app.models.billFood import BillFood
+# from app.core.dropBox import upload_db
 from fastapi import APIRouter, Depends
 from app.models.console import Console
+from app.models.buffet import Buffet
 from sqlalchemy.orm import Session
-from datetime import datetime, timezone, timedelta
 from app.db.session import get_db
 from app.models.user import User
 from app.models.bill import Bill
@@ -17,7 +17,7 @@ from fastapi import Path
 from math import ceil
 
 router = APIRouter(
-    prefix="/api/v1/bill",
+    prefix="/cafe-game-api/v1/bill",
     tags=["Bill"],
     dependencies=[Depends(get_current_user)]
 )
@@ -97,7 +97,7 @@ def create_bill(
     db.add(new_bill)
     db.commit()
     db.refresh(new_bill)
-    upload_db()
+    # upload_db()
     return new_bill
 
 
@@ -187,7 +187,7 @@ def close_bill(
 
     db.commit()
     db.refresh(bill)
-    upload_db()
+    # upload_db()
     return
 
 
@@ -285,7 +285,7 @@ def update_bill(
 
     db.commit()
     db.refresh(bill)
-    upload_db()
+    # upload_db()
 
 
 
@@ -317,4 +317,4 @@ def delete_bill(
 
     db.delete(bill)
     db.commit()
-    upload_db()
+    # upload_db()

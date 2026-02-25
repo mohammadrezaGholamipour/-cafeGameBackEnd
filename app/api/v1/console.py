@@ -1,15 +1,15 @@
-from fastapi import APIRouter, Depends, status, HTTPException, Path
-
-from app.core.dropBox import upload_db
 from app.schemas.console import ConsoleWithOwner,ConsoleWithOutOwner
+from fastapi import APIRouter, Depends, status, HTTPException, Path
 from app.core.security import get_current_user
+# from app.core.dropBox import upload_db
 from app.models.console import Console
 from sqlalchemy.orm import Session
 from app.db.session import get_db
 from app.models.user import User
 from typing import Annotated
 
-router = APIRouter(prefix="/api/v1/console", tags=["Console"], dependencies=[Depends(get_current_user)])
+
+router = APIRouter(prefix="/cafe-game-api/v1/console", tags=["Console"], dependencies=[Depends(get_current_user)])
 
 
 @router.post(
@@ -44,7 +44,7 @@ def create_console(
     db.add(new_console)
     db.commit()
     db.refresh(new_console)
-    upload_db()
+    # upload_db()
     return new_console
 
 
@@ -87,7 +87,7 @@ def delete_console(
 
     console.is_deleted = True
     db.commit()
-    upload_db()
+    # upload_db()
 
 
 @router.get("/my-console", response_model=list[ConsoleWithOutOwner])

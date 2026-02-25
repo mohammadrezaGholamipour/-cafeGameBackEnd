@@ -1,14 +1,14 @@
-from app.core.dropBox import upload_db
 from app.schemas.unitPrice import UnitPriceCreate, UnitPriceWithOwner,UnitPriceWithOutOwner
 from fastapi import APIRouter, Depends, HTTPException, status,Path
 from app.core.security import get_current_user
 from app.models.unitPrice import UnitPrice
+# from app.core.dropBox import upload_db
 from sqlalchemy.orm import Session
 from typing import List, Annotated
 from app.db.session import get_db
 from app.models.user import User
 
-router = APIRouter(prefix="/api/v1/unit-price", tags=["UnitPrice"], dependencies=[Depends(get_current_user)])
+router = APIRouter(prefix="/cafe-game-api/v1/unit-price", tags=["UnitPrice"], dependencies=[Depends(get_current_user)])
 
 
 @router.post("/create", response_model=UnitPriceWithOwner, status_code=status.HTTP_201_CREATED)
@@ -38,7 +38,7 @@ def create_unit_price(
     db.add(new_unit_price)
     db.commit()
     db.refresh(new_unit_price)
-    upload_db()
+    # upload_db()
     return new_unit_price
 
 @router.get("/list", response_model=List[UnitPriceWithOwner])
@@ -73,7 +73,7 @@ def delete_unit_price(
 
     db.delete(unit_price)
     db.commit()
-    upload_db()
+    # upload_db()
 
 @router.get("/my-unit-price", response_model=list[UnitPriceWithOutOwner])
 def list_my_unit_price(
