@@ -1,8 +1,5 @@
-from pydantic import BaseModel, field_serializer
-from zoneinfo import ZoneInfo
+from pydantic import BaseModel
 from datetime import datetime
-
-TEHRAN_TZ = ZoneInfo("Asia/Tehran")
 
 
 class BillCreate(BaseModel):
@@ -33,12 +30,6 @@ class BillWithOutDetails(BaseModel):
         "from_attributes": True
     }
 
-    @field_serializer("start_time", "end_time")
-    def convert_to_tehran(self, value: datetime | None):
-        if value is None:
-            return None
-        return value.astimezone(TEHRAN_TZ).isoformat()
-
 
 class BillWithOwner(BaseModel):
     id: int
@@ -55,12 +46,6 @@ class BillWithOwner(BaseModel):
     model_config = {
         "from_attributes": True
     }
-
-    @field_serializer("start_time", "end_time")
-    def convert_to_tehran(self, value: datetime | None):
-        if value is None:
-            return None
-        return value.astimezone(TEHRAN_TZ).isoformat()
 
 
 from app.schemas.billFood import BillFoodWithOutDetails, BillFoodItem
