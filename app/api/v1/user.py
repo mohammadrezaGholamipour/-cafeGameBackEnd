@@ -17,7 +17,7 @@ def list_users(db: Session = Depends(get_db)):
     return users
 
 
-@router.patch("/update", response_model=UserOut)
+@router.put("/update", response_model=UserOut)
 def update_user(
     payload: UserUpdate,
     db: Session = Depends(get_db),

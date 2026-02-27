@@ -68,12 +68,12 @@ app = FastAPI(title="CafeGame", description="API for managing CafeGame", version
         }
     }
 })
-
+#
 # download_db()
 
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["*"],
+    allow_origins=["https://cafegame.ir"],
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],

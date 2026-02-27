@@ -71,21 +71,19 @@ def create_bill(
 
     unit_price = (
         db.query(UnitPrice)
-        .filter(UnitPrice.price == bill_data.unit_price_amount)
+        .filter(
+            UnitPrice.price == bill_data.unit_price_amount,
+            UnitPrice.owner_id == current_user.id
+        )
         .first()
     )
 
     if not unit_price:
         raise HTTPException(
             status_code=status.HTTP_404_NOT_FOUND,
-            detail={"field": "UnitPrice", "message": "قیمت واحد یافت نشد"}
+            detail={"field": "UnitPrice", "message": "قیمت واحد وارد شده وجود ندارد"}
         )
 
-    if unit_price.owner_id != current_user.id:
-        raise HTTPException(
-            status_code=status.HTTP_403_FORBIDDEN,
-            detail={"field": "UnitPrice", "message": "این قیمت واحد متعلق به شما نیست"}
-        )
 
     new_bill = Bill(
         owner_id=current_user.id,
@@ -135,7 +133,7 @@ def list_my_bills(
     return bills
 
 
-@router.patch(
+@router.put(
     "/{bill_id}/close",
     status_code=status.HTTP_204_NO_CONTENT
 )
@@ -213,7 +211,7 @@ def list_my_open_bills(
     return open_bills
 
 
-@router.patch("/update-bill/{bill_id}", status_code=status.HTTP_204_NO_CONTENT)
+@router.put("/update-bill/{bill_id}", status_code=status.HTTP_204_NO_CONTENT)
 def update_bill(
         bill_id: Annotated[int, Path(..., gt=0)],
         bill_data: BillUpdate,

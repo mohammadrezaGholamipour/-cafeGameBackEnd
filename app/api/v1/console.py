@@ -1,10 +1,10 @@
 from app.schemas.console import ConsoleWithOwner,ConsoleWithOutOwner
 from fastapi import APIRouter, Depends, status, HTTPException, Path
 from app.core.security import get_current_user
-# from app.core.dropBox import upload_db
 from app.models.console import Console
 from sqlalchemy.orm import Session
 from app.db.session import get_db
+from app.models.bill import Bill
 from app.models.user import User
 from typing import Annotated
 
@@ -59,6 +59,10 @@ def list_all_consoles(db: Session = Depends(get_db)):
     "/{console_id}",
     status_code=status.HTTP_204_NO_CONTENT
 )
+@router.delete(
+    "/{console_id}",
+    status_code=status.HTTP_204_NO_CONTENT
+)
 def delete_console(
         console_id: Annotated[int, Path(..., gt=0)],
         current_user: Annotated[User, Depends(get_current_user)],
@@ -82,12 +86,30 @@ def delete_console(
             detail={"field": "Console", "message": "این دستگاه متعلق به شما نیست"}
         )
 
+    # ✅ بررسی فاکتور باز
+    active_bill = (
+        db.query(Bill)
+        .filter(
+            Bill.console_id == console.id,
+            Bill.end_time.is_(None)
+        )
+        .first()
+    )
+
+    if active_bill:
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail={
+                "field": "Console",
+                "message": "برای این دستگاه یک فاکتور باز وجود دارد. ابتدا فاکتور را ببندید یا حذف کنید."
+            }
+        )
+
     if console.is_deleted:
         return
 
     console.is_deleted = True
     db.commit()
-    # upload_db()
 
 
 @router.get("/my-console", response_model=list[ConsoleWithOutOwner])
