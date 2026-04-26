@@ -8,7 +8,7 @@ from sqlalchemy import Column, Integer, ForeignKey, UniqueConstraint
 from sqlalchemy.orm import relationship
 
 class UnitPrice(Base):
-    __tablename__ = "unitPrice"
+    __tablename__ = "unitprice"
 
     id = Column(Integer, primary_key=True, index=True)
     price = Column(Integer, nullable=False, index=True)

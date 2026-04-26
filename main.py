@@ -3,7 +3,7 @@ from starlette.exceptions import HTTPException as StarletteHTTPException
 from app.api.v1 import auth, user, console, buffet, unitPrice, bill
 from fastapi.exceptions import RequestValidationError
 from starlette.middleware.cors import CORSMiddleware
-from app.core.dropBox import download_db
+import uvicorn
 from fastapi import FastAPI
 
 app = FastAPI(title="CafeGame", description="API for managing CafeGame", version="1.0.0", responses={
@@ -68,12 +68,11 @@ app = FastAPI(title="CafeGame", description="API for managing CafeGame", version
         }
     }
 })
-#
 # download_db()
 
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["https://cafegame.ir"],
+    allow_origins=["*"],
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
@@ -88,3 +87,5 @@ app.include_router(bill.router)
 
 app.add_exception_handler(RequestValidationError, validation_exception_handler)
 app.add_exception_handler(StarletteHTTPException, http_exception_handler)
+
+uvicorn.run(app, host="0.0.0.0", port=8000)
