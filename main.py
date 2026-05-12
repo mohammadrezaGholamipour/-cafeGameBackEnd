@@ -68,7 +68,6 @@ app = FastAPI(title="CafeGame", description="API for managing CafeGame", version
         }
     }
 })
-# download_db()
 
 app.add_middleware(
     CORSMiddleware,
