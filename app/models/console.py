@@ -12,7 +12,7 @@ class Console(Base):
     is_deleted = Column(Boolean, default=False)
     owner_id = Column(Integer, ForeignKey("users.id"), nullable=False)
     owner = relationship("User", back_populates="console")
-    type = Column(String, nullable=True)
+    # type = Column(String, nullable=True)
 
 
 from app.models.user import User

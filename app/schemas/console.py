@@ -7,7 +7,7 @@ class ConsoleWithOutOwner(BaseModel):
     id: int
     name: str
     is_deleted:bool
-    type: Optional[str]
+    # type: Optional[str]
     model_config = {
         "from_attributes": True
     }
